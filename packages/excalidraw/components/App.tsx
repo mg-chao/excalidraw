@@ -6048,6 +6048,8 @@ class App extends React.Component<AppProps, AppState> {
           { informMutation: false, isDragging: false },
         );
       } else {
+        this.updateSerialNumberBindings(multiElement);
+
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
@@ -8045,6 +8047,8 @@ class App extends React.Component<AppProps, AppState> {
         startBoundElement: boundElement,
         suggestedBindings: [],
       });
+
+      this.updateSerialNumberBindings(element);
     }
   };
 
@@ -8236,16 +8240,21 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private updateSerialNumberBindings = debounce(
-    (
-      linearElement: LinearElementEditor,
-      elementsMap: ReturnType<typeof this.scene.getNonDeletedElementsMap>,
-    ) => {
-      if (!linearElement.startBindingElement) {
+    (linearElement: LinearElementEditor | ExcalidrawLinearElement) => {
+      if (this.state.selectedLinearElement) {
         return;
       }
 
-      const arrowElement = elementsMap.get(linearElement.elementId);
-      if (!isArrowElement(arrowElement) || !arrowElement.startBinding) {
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const arrowElement =
+        "elementId" in linearElement
+          ? elementsMap.get(linearElement.elementId)
+          : elementsMap.get(linearElement.id);
+      if (!arrowElement) {
+        return;
+      }
+
+      if (!(arrowElement.type === "arrow" && arrowElement.startBinding)) {
         return;
       }
       const boundElement = elementsMap.get(
@@ -8261,7 +8270,7 @@ class App extends React.Component<AppProps, AppState> {
 
       updateBoundElements(boundElement, this.scene);
     },
-    (1000 / 60) * 5,
+    1000 / 60,
   );
 
   private onPointerMoveFromPointerDownHandler(
@@ -8467,11 +8476,6 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.drag.hasOccurred = true;
 
           this.setState(newState);
-
-          this.updateSerialNumberBindings(
-            this.state.selectedLinearElement,
-            elementsMap,
-          );
 
           return;
         }
@@ -8952,6 +8956,8 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             newElement,
           });
+
+          this.updateSerialNumberBindings(newElement);
 
           if (isBindingElement(newElement, false)) {
             // When creating a linear element by dragging
