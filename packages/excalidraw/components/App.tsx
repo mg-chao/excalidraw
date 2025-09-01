@@ -6048,6 +6048,8 @@ class App extends React.Component<AppProps, AppState> {
           { informMutation: false, isDragging: false },
         );
       } else {
+        this.updateSerialNumberBindings(multiElement);
+
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
@@ -6682,7 +6684,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const isActiveSelectionTool =
       pointerDownState.resize.isResizing ||
-      pointerDownState.hit.element?.type === this.state.activeTool.type;
+      pointerDownState.hit.element?.type === this.state.activeTool.type ||
+      (this.props.customOptions?.getExtraTools?.()?.includes("serialNumber") &&
+        pointerDownState.hit.element?.id.startsWith("snow-shot_serial-number"));
 
     if (this.state.activeTool.type === "lasso") {
       this.lassoTrail.startPath(
@@ -8043,6 +8047,8 @@ class App extends React.Component<AppProps, AppState> {
         startBoundElement: boundElement,
         suggestedBindings: [],
       });
+
+      this.updateSerialNumberBindings(element);
     }
   };
 
@@ -8233,6 +8239,40 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  private updateSerialNumberBindings = debounce(
+    (linearElement: LinearElementEditor | ExcalidrawLinearElement) => {
+      if (this.state.selectedLinearElement) {
+        return;
+      }
+
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const arrowElement =
+        "elementId" in linearElement
+          ? elementsMap.get(linearElement.elementId)
+          : elementsMap.get(linearElement.id);
+      if (!arrowElement) {
+        return;
+      }
+
+      if (!(arrowElement.type === "arrow" && arrowElement.startBinding)) {
+        return;
+      }
+      const boundElement = elementsMap.get(
+        arrowElement.startBinding?.elementId,
+      );
+
+      if (
+        !boundElement ||
+        !boundElement.id.startsWith("snow-shot_serial-number")
+      ) {
+        return;
+      }
+
+      updateBoundElements(boundElement, this.scene);
+    },
+    1000 / 60,
+  );
+
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ) {
@@ -8361,6 +8401,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
+
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
@@ -8371,6 +8412,7 @@ class App extends React.Component<AppProps, AppState> {
           return true;
         }
       }
+
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       if (this.state.selectedLinearElement) {
@@ -8427,6 +8469,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerCoords.y,
           linearElementEditor,
         );
+
         if (newState) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
@@ -8479,6 +8522,7 @@ class App extends React.Component<AppProps, AppState> {
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         // Checking for editingTextElement to avoid jump while editing on mobile #6503
+
         if (
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
@@ -8912,6 +8956,8 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             newElement,
           });
+
+          this.updateSerialNumberBindings(newElement);
 
           if (isBindingElement(newElement, false)) {
             // When creating a linear element by dragging
