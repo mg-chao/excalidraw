@@ -121,12 +121,14 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       remotePointerButton.set(socketId, user.button);
     });
 
-    const selectionColor =
+    let selectionColor =
       (props.containerRef?.current &&
         getComputedStyle(props.containerRef.current).getPropertyValue(
           "--color-selection",
         )) ||
       "#6965db";
+
+    selectionColor = "#4096ff";
 
     renderInteractiveScene(
       {

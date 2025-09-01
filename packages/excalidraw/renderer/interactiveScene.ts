@@ -167,13 +167,13 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   isPhantomPoint: boolean,
   isOverlappingPoint: boolean,
 ) => {
-  context.strokeStyle = "#5e5ad8";
+  context.strokeStyle = "#4096ff";
   context.setLineDash([]);
   context.fillStyle = "rgba(255, 255, 255, 0.9)";
   if (isSelected) {
-    context.fillStyle = "rgba(134, 131, 226, 0.9)";
+    context.fillStyle = "rgba(9, 88, 217, 0.9)";
   } else if (isPhantomPoint) {
-    context.fillStyle = "rgba(177, 151, 252, 0.7)";
+    context.fillStyle = "rgba(22, 119, 255, 0.7)";
   }
 
   fillCircle(

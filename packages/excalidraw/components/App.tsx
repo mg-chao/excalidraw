@@ -5471,11 +5471,25 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // we should only be able to double click when mode is selection
-    if (this.state.activeTool.type !== "selection") {
+    if (
+      !(
+        this.state.activeTool.type === "selection" ||
+        this.state.activeTool.type === "text"
+      )
+    ) {
       return;
     }
 
     const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (this.state.activeTool.type === "text") {
+      if (
+        selectedElements.length !== 1 ||
+        selectedElements[0].type !== "text"
+      ) {
+        return;
+      }
+    }
 
     let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
@@ -5768,6 +5782,19 @@ class App extends React.Component<AppProps, AppState> {
       );
 
     return frames.length ? frames[frames.length - 1] : null;
+  };
+
+  private canSelectType = (type: ToolType | "custom") => {
+    return (
+      type === "rectangle" ||
+      type === "diamond" ||
+      type === "ellipse" ||
+      type === "arrow" ||
+      type === "line" ||
+      type === "freedraw" ||
+      type === "text" ||
+      type === "blur"
+    );
   };
 
   private handleCanvasPointerMove = (
@@ -6088,7 +6115,11 @@ class App extends React.Component<AppProps, AppState> {
       hasDeselectedButton ||
       (this.state.activeTool.type !== "selection" &&
         this.state.activeTool.type !== "text" &&
-        this.state.activeTool.type !== "eraser")
+        this.state.activeTool.type !== "eraser" &&
+        !(
+          this.canSelectType(this.state.activeTool.type) ||
+          this.props.customOptions?.getExtraTools?.()?.includes("serialNumber")
+        ))
     ) {
       return;
     }
@@ -6186,6 +6217,18 @@ class App extends React.Component<AppProps, AppState> {
     if (isEraserActive(this.state)) {
       return;
     }
+
+    if (
+      this.state.activeTool.type !== "selection" &&
+      hitElement?.type !== this.state.activeTool.type &&
+      !(
+        this.props.customOptions?.getExtraTools?.()?.includes("serialNumber") &&
+        hitElement?.id.startsWith("snow-shot_serial-number")
+      )
+    ) {
+      return;
+    }
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
@@ -6637,6 +6680,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    const isActiveSelectionTool =
+      pointerDownState.resize.isResizing ||
+      pointerDownState.hit.element?.type === this.state.activeTool.type;
+
     if (this.state.activeTool.type === "lasso") {
       this.lassoTrail.startPath(
         pointerDownState.origin.x,
@@ -6644,22 +6691,28 @@ class App extends React.Component<AppProps, AppState> {
         event.shiftKey,
       );
     } else if (this.state.activeTool.type === "text") {
-      this.handleTextOnPointerDown(event, pointerDownState);
+      if (!isActiveSelectionTool) {
+        this.handleTextOnPointerDown(event, pointerDownState);
+      }
     } else if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
     ) {
-      this.handleLinearElementOnPointerDown(
-        event,
-        this.state.activeTool.type,
-        pointerDownState,
-      );
+      if (!isActiveSelectionTool || this.state.multiElement) {
+        this.handleLinearElementOnPointerDown(
+          event,
+          this.state.activeTool.type,
+          pointerDownState,
+        );
+      }
     } else if (this.state.activeTool.type === "freedraw") {
-      this.handleFreeDrawElementOnPointerDown(
-        event,
-        this.state.activeTool.type,
-        pointerDownState,
-      );
+      if (!isActiveSelectionTool) {
+        this.handleFreeDrawElementOnPointerDown(
+          event,
+          this.state.activeTool.type,
+          pointerDownState,
+        );
+      }
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
@@ -7079,7 +7132,11 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelectionIfNotUsingSelection = (): void => {
     if (
       this.state.activeTool.type !== "selection" &&
-      this.state.activeTool.type !== "lasso"
+      this.state.activeTool.type !== "lasso" &&
+      !(
+        this.canSelectType(this.state.activeTool.type) ||
+        this.props.customOptions?.getExtraTools?.()?.includes("serialNumber")
+      )
     ) {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
@@ -7097,7 +7154,11 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (this.state.activeTool.type === "selection") {
+    if (
+      this.state.activeTool.type === "selection" ||
+      this.canSelectType(this.state.activeTool.type) ||
+      this.props.customOptions?.getExtraTools?.()?.includes("serialNumber")
+    ) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
@@ -7152,6 +7213,7 @@ class App extends React.Component<AppProps, AppState> {
           this.device,
         );
       }
+
       if (pointerDownState.resize.handleType) {
         pointerDownState.resize.isResizing = true;
         pointerDownState.resize.offset = tupleToCoors(
@@ -7195,13 +7257,36 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        const allHitElements = this.getElementsAtPosition(
+        let allHitElements = this.getElementsAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
           {
             includeLockedElements: true,
           },
         );
+
+        const isSerialNumberTool = this.props.customOptions
+          ?.getExtraTools?.()
+          ?.includes("serialNumber");
+
+        // 如果是非选择模式，则过滤掉非当前工具的元素
+        if (this.state.activeTool.type !== "selection") {
+          allHitElements = allHitElements.filter((e) => {
+            if (e.type === this.state.activeTool.type) {
+              return true;
+            }
+
+            if (
+              isSerialNumberTool &&
+              e.id.startsWith("snow-shot_serial-number")
+            ) {
+              return true;
+            }
+
+            return false;
+          });
+        }
+
         const unlockedHitElements = allHitElements.filter((e) => !e.locked);
 
         // Cannot set preferSelected in getElementAtPosition as we do in pointer move; consider:
@@ -7240,6 +7325,19 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.origin.x,
               pointerDownState.origin.y,
             );
+
+          if (
+            this.state.activeTool.type !== "selection" &&
+            pointerDownState.hit.element?.type !== this.state.activeTool.type &&
+            !(
+              isSerialNumberTool &&
+              pointerDownState.hit.element?.id.startsWith(
+                "snow-shot_serial-number",
+              )
+            )
+          ) {
+            pointerDownState.hit.element = null;
+          }
         }
 
         this.hitLinkElement = this.getElementLinkAtPosition(
@@ -7277,10 +7375,29 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.allHitElements = unlockedHitElements;
 
         const hitElement = pointerDownState.hit.element;
+
+        // 如果是非选择模式，则过滤掉非当前工具的元素
+        if (
+          hitElement &&
+          this.state.activeTool.type !== "selection" &&
+          hitElement.type !== this.state.activeTool.type &&
+          !(
+            isSerialNumberTool &&
+            hitElement.id.startsWith("snow-shot_serial-number")
+          )
+        ) {
+          return false;
+        }
+
         const someHitElementIsSelected =
-          pointerDownState.hit.allHitElements.some((element) =>
-            this.isASelectedElement(element),
-          );
+          pointerDownState.hit.allHitElements.some((element) => {
+            // 同类型元素在非选择模式下会被清除
+            if (element.type === this.state.activeTool.type) {
+              return false;
+            }
+
+            return this.isASelectedElement(element);
+          });
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
@@ -7322,7 +7439,13 @@ class App extends React.Component<AppProps, AppState> {
           // if shift is not clicked, this will always return true
           // otherwise, it will trigger selection based on current
           // state of the box
-          if (!this.state.selectedElementIds[hitElement.id]) {
+          if (
+            !this.state.selectedElementIds[hitElement.id] ||
+            // 同类型的元素会被清除，所以需要重新选一次，视作未选择
+            hitElement.type === this.state.activeTool.type ||
+            (isSerialNumberTool &&
+              hitElement.id.startsWith("snow-shot_serial-number"))
+          ) {
             // if we are currently editing a group, exiting editing mode and deselect the group.
             if (
               this.state.editingGroupId &&
@@ -7343,7 +7466,16 @@ class App extends React.Component<AppProps, AppState> {
             // elements are not selected at the same time.
             if (
               !someHitElementIsSelected &&
-              !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+              !(
+                pointerDownState.hit
+                  .hasHitCommonBoundingBoxOfSelectedElements &&
+                pointerDownState.hit.element?.type !==
+                  this.state.activeTool.type &&
+                !(
+                  isSerialNumberTool &&
+                  hitElement.id.startsWith("snow-shot_serial-number")
+                )
+              )
             ) {
               this.setState((prevState) => {
                 let nextSelectedElementIds: { [id: string]: true } = {
