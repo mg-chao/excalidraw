@@ -6682,7 +6682,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const isActiveSelectionTool =
       pointerDownState.resize.isResizing ||
-      pointerDownState.hit.element?.type === this.state.activeTool.type;
+      pointerDownState.hit.element?.type === this.state.activeTool.type ||
+      (this.props.customOptions?.getExtraTools?.()?.includes("serialNumber") &&
+        pointerDownState.hit.element?.id.startsWith("snow-shot_serial-number"));
 
     if (this.state.activeTool.type === "lasso") {
       this.lassoTrail.startPath(
@@ -8233,6 +8235,35 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  private updateSerialNumberBindings = debounce(
+    (
+      linearElement: LinearElementEditor,
+      elementsMap: ReturnType<typeof this.scene.getNonDeletedElementsMap>,
+    ) => {
+      if (!linearElement.startBindingElement) {
+        return;
+      }
+
+      const arrowElement = elementsMap.get(linearElement.elementId);
+      if (!isArrowElement(arrowElement) || !arrowElement.startBinding) {
+        return;
+      }
+      const boundElement = elementsMap.get(
+        arrowElement.startBinding?.elementId,
+      );
+
+      if (
+        !boundElement ||
+        !boundElement.id.startsWith("snow-shot_serial-number")
+      ) {
+        return;
+      }
+
+      updateBoundElements(boundElement, this.scene);
+    },
+    (1000 / 60) * 5,
+  );
+
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ) {
@@ -8361,6 +8392,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
+
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
@@ -8371,6 +8403,7 @@ class App extends React.Component<AppProps, AppState> {
           return true;
         }
       }
+
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       if (this.state.selectedLinearElement) {
@@ -8427,12 +8460,18 @@ class App extends React.Component<AppProps, AppState> {
           pointerCoords.y,
           linearElementEditor,
         );
+
         if (newState) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
           pointerDownState.drag.hasOccurred = true;
 
           this.setState(newState);
+
+          this.updateSerialNumberBindings(
+            this.state.selectedLinearElement,
+            elementsMap,
+          );
 
           return;
         }
@@ -8479,6 +8518,7 @@ class App extends React.Component<AppProps, AppState> {
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         // Checking for editingTextElement to avoid jump while editing on mobile #6503
+
         if (
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
