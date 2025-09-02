@@ -210,8 +210,8 @@ body.excalidraw-cursor-resize * {
   button:focus-visible,
   .buttonList label:focus-within,
   input:focus-visible {
-    outline: transparent;
-    box-shadow: 0 0 0 1px var(--color-brand-hover);
+    // outline: transparent;
+    // box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
 
   .buttonList {

@@ -9474,6 +9474,23 @@ class App extends React.Component<AppProps, AppState> {
           captureUpdate: CaptureUpdateAction.NEVER,
         });
 
+        // 保存非选择状态下的变换记录
+        if (
+          // 拖拽
+          pointerDownState.drag.hasOccurred ||
+          // 旋转
+          (pointerDownState.resize.isResizing &&
+            pointerDownState.resize.handleType === "rotation") ||
+          // 变换元素
+          resizingElement?.type === this.state.activeTool.type ||
+          (this.props.customOptions
+            ?.getExtraTools?.()
+            ?.includes("serialNumber") &&
+            resizingElement?.id.startsWith("snow-shot_serial-number"))
+        ) {
+          this.store.scheduleCapture();
+        }
+
         return;
       }
 
