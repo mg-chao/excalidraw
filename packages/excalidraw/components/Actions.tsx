@@ -122,19 +122,22 @@ export const SelectedShapeActions = ({
 }) => {
   const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
   const extraTools = customOptions?.getExtraTools?.();
-  const { extraHasTextTool, extraHasBackgroundTool } = useMemo(() => {
-    let extraHasTextTool = false;
-    let extraHasBackgroundTool = false;
-    if (extraTools) {
-      extraTools.forEach((tool) => {
-        if (tool === "serialNumber") {
-          extraHasTextTool = true;
-          extraHasBackgroundTool = true;
-        }
-      });
-    }
-    return { extraHasTextTool, extraHasBackgroundTool };
-  }, [extraTools]);
+  const { extraHasTextTool, extraHasBackgroundTool, isSerialNumberTool } =
+    useMemo(() => {
+      let extraHasTextTool = false;
+      let extraHasBackgroundTool = false;
+      let isSerialNumberTool = false;
+      if (extraTools) {
+        extraTools.forEach((tool) => {
+          if (tool === "serialNumber") {
+            extraHasTextTool = true;
+            extraHasBackgroundTool = true;
+            isSerialNumberTool = true;
+          }
+        });
+      }
+      return { extraHasTextTool, extraHasBackgroundTool, isSerialNumberTool };
+    }, [extraTools]);
 
   const targetElements = getTargetElements(elementsMap, appState);
 
@@ -193,6 +196,22 @@ export const SelectedShapeActions = ({
         extraHasBackgroundTool) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
+
+      {customOptions?.pickerRenders?.SubToolEditor && (
+        <customOptions.pickerRenders.SubToolEditor
+          appState={appState}
+          targetElements={targetElements}
+        />
+      )}
+
+      {isSerialNumberTool &&
+        customOptions?.pickerRenders?.SerialNumberEditor && (
+          <customOptions.pickerRenders.SerialNumberEditor
+            appState={appState}
+            targetElements={targetElements}
+          />
+        )}
+
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

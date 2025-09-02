@@ -565,6 +565,14 @@ export interface ExcalidrawPropsCustomOptions {
   };
   getExtraTools?: () => string[];
   pickerRenders?: {
+    SubToolEditor?: React.ComponentType<{
+      appState: UIAppState;
+      targetElements: ExcalidrawElement[];
+    }>;
+    SerialNumberEditor?: React.ComponentType<{
+      appState: UIAppState;
+      targetElements: ExcalidrawElement[];
+    }>;
     ButtonList?: React.ComponentType<{
       children: React.ReactNode;
       className?: string;
