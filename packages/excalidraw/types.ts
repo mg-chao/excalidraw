@@ -258,8 +258,10 @@ export type ObservedElementsAppState = {
   editingGroupId: AppState["editingGroupId"];
   selectedElementIds: AppState["selectedElementIds"];
   selectedGroupIds: AppState["selectedGroupIds"];
-  selectedLinearElementId: LinearElementEditor["elementId"] | null;
-  selectedLinearElementIsEditing: boolean | null;
+  selectedLinearElement: {
+    elementId: LinearElementEditor["elementId"];
+    isEditing: boolean;
+  } | null;
   croppingElementId: AppState["croppingElementId"];
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
@@ -857,6 +859,8 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+
+  defaultSelectionTool: "selection" | "lasso";
 };
 
 export type PointerDownState = Readonly<{
@@ -906,6 +910,10 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
+    // Whether to block drag after lasso selection
+    // this is meant to be used to block dragging after lasso selection on PCs
+    // until the next pointer down
+    blockDragging: boolean;
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
@@ -927,6 +935,7 @@ export type UnsubscribeCallback = () => void;
 
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
+  applyDeltas: InstanceType<typeof App>["applyDeltas"];
   mutateElement: InstanceType<typeof App>["mutateElement"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
