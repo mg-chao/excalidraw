@@ -480,6 +480,7 @@ export const TOOL_TYPE = {
   embeddable: "embeddable",
   laser: "laser",
   blur: "blur",
+  watermark: "watermark",
 } as const;
 
 export const EDITOR_LS_KEYS = {

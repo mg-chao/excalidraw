@@ -49,6 +49,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawBlurElement,
   ExcalidrawLineElement,
+  ExcalidrawWatermarkElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -232,6 +233,31 @@ export const newBlurElement = (
   );
 
   return blurElement;
+};
+
+export const newWatermarkElement = (
+  opts: {
+    watermarkText: string;
+    watermarkFontSize: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawWatermarkElement> => {
+  const watermarkElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawWatermarkElement>("watermark", opts),
+      type: "watermark",
+      watermarkText: opts.watermarkText,
+      watermarkFontSize: opts.watermarkFontSize,
+      // 将 watermark 元素放在画布之外，避免被用户选中
+      // 后续通过逻辑保持只有一个 watermark 元素
+      width: 0,
+      height: 0,
+      x: -Number.MAX_SAFE_INTEGER,
+      y: -Number.MAX_SAFE_INTEGER,
+    },
+    {},
+  );
+
+  return watermarkElement;
 };
 
 /** computes element x/y offset based on textAlign/verticalAlign */

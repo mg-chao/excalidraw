@@ -94,6 +94,12 @@ export type ExcalidrawBlurElement = _ExcalidrawElementBase & {
   blur: number;
 };
 
+export type ExcalidrawWatermarkElement = _ExcalidrawElementBase & {
+  type: "watermark";
+  watermarkText: string;
+  watermarkFontSize: number;
+};
+
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
   type: "diamond";
 };
@@ -200,6 +206,7 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawBlurElement
+  | ExcalidrawWatermarkElement
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawSelectionElement;
@@ -220,7 +227,8 @@ export type ExcalidrawElement =
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
-  | ExcalidrawBlurElement;
+  | ExcalidrawBlurElement
+  | ExcalidrawWatermarkElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,

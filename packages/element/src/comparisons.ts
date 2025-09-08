@@ -44,7 +44,8 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
 
 export const canChangeBlur = (type: ElementOrToolType) => type === "blur";
 
-export const canChangeLayer = (type: ElementOrToolType) => type !== "blur";
+export const canChangeLayer = (type: ElementOrToolType) =>
+  type !== "blur" && type !== "watermark";
 
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
 

@@ -171,6 +171,12 @@ export const isBlurElementType = (elementType: ElementOrToolType): boolean => {
   return elementType === "blur";
 };
 
+export const isWatermarkElementType = (
+  elementType: ElementOrToolType,
+): boolean => {
+  return elementType === "watermark";
+};
+
 export const isBindingElement = (
   element?: ExcalidrawElement | null,
   includeLocked = true,
@@ -276,6 +282,7 @@ export const isExcalidrawElement = (
     case "magicframe":
     case "image":
     case "blur":
+    case "watermark":
     case "selection": {
       return true;
     }

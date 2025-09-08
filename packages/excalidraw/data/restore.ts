@@ -105,6 +105,7 @@ export const AllowedExcalidrawActiveTools: Record<
   laser: false,
   magicframe: false,
   blur: true,
+  watermark: true,
 };
 
 export type RestoredDataState = {
@@ -401,6 +402,7 @@ export const restoreElement = (
     // generic elements
     case "ellipse":
     case "blur":
+    case "watermark":
     case "rectangle":
     case "diamond":
     case "iframe":

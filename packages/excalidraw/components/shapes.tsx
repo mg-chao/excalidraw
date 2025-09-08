@@ -83,7 +83,14 @@ export const SHAPES = [
     icon: RectangleIcon,
     key: null,
     value: "blur",
-    numericKey: KEYS["9"],
+    numericKey: "",
+    fillable: false,
+  },
+  {
+    icon: RectangleIcon,
+    value: "watermark",
+    key: null,
+    numericKey: "",
     fillable: false,
   },
   {
