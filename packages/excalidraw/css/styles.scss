@@ -536,32 +536,32 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  input.is-redacted {
-    // we don't use type=password because browsers (chrome?) prompt
-    // you to save it which is annoying
-    -webkit-text-security: disc;
-  }
+//   input.is-redacted {
+//     // we don't use type=password because browsers (chrome?) prompt
+//     // you to save it which is annoying
+//     -webkit-text-security: disc;
+//   }
 
-  input[type="text"],
-  textarea:not(.excalidraw-wysiwyg) {
-    color: var(--text-primary-color);
-    border: 1.5px solid var(--input-border-color);
-    padding: 0.75rem;
-    white-space: nowrap;
-    border-radius: var(--space-factor);
-    background-color: var(--input-bg-color);
+//   input[type="text"],
+//   textarea:not(.excalidraw-wysiwyg) {
+//     color: var(--text-primary-color);
+//     border: 1.5px solid var(--input-border-color);
+//     padding: 0.75rem;
+//     white-space: nowrap;
+//     border-radius: var(--space-factor);
+//     background-color: var(--input-bg-color);
 
-    &:not(:focus) {
-      &:hover {
-        border-color: var(--color-brand-hover);
-      }
-    }
+//     &:not(:focus) {
+//       &:hover {
+//         border-color: var(--color-brand-hover);
+//       }
+//     }
 
-    &:focus {
-      outline: none;
-      border-color: var(--color-brand-hover);
-    }
-  }
+//     &:focus {
+//       outline: none;
+//       border-color: var(--color-brand-hover);
+//     }
+//   }
 
   @media print {
     .App-bottom-bar,

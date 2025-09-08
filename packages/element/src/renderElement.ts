@@ -417,7 +417,9 @@ const drawElementOnCanvas = (
       rc.draw(ShapeCache.get(element)!);
       break;
     }
+    // Blur 和 Watermark 都放到 Snow Shot 上渲染
     case "blur":
+    case "watermark":
       break;
     case "arrow":
     case "line": {
@@ -830,6 +832,7 @@ export const renderElement = (
     case "text":
     case "iframe":
     case "blur":
+    case "watermark":
     case "embeddable": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)

@@ -215,6 +215,7 @@ export const generateRoughOptions = (
     case "embeddable":
     case "diamond":
     case "blur":
+    case "watermark":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
@@ -620,6 +621,7 @@ const generateElementShape = (
     case "rectangle":
     case "iframe":
     case "blur":
+    case "watermark":
     case "embeddable": {
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
@@ -923,6 +925,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "image":
     case "iframe":
     case "blur":
+    case "watermark":
     case "text":
     case "selection":
       return getPolygonShape(element);

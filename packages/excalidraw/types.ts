@@ -164,7 +164,8 @@ export type ToolType =
   | "magicframe"
   | "embeddable"
   | "laser"
-  | "blur";
+  | "blur"
+  | "watermark";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 

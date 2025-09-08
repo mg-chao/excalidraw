@@ -94,6 +94,7 @@ export const canChangeStrokeColor = (
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
       commonSelectedType !== "blur" &&
+      commonSelectedType !== "watermark" &&
       commonSelectedType !== "magicframe") ||
     targetElements.some((element) => hasStrokeColor(element.type))
   );
@@ -250,6 +251,10 @@ export const SelectedShapeActions = ({
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
         </>
+      )}
+
+      {appState.activeTool.type === "watermark" && (
+        <>{renderAction("changeFontSize")}</>
       )}
 
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&

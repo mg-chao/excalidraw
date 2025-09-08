@@ -18,6 +18,7 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
+  newWatermarkElement,
 } from "@excalidraw/element";
 
 import { isLinearElementType } from "@excalidraw/element";
@@ -365,6 +366,9 @@ export class API {
       case "blur":
             element = newBlurElement({ ...base, width, height, blur: appState.currentItemBlur});
             break;
+      case "watermark":
+        element = newWatermarkElement({ ...base, width, height, watermarkText: "", watermarkFontSize: appState.currentItemFontSize });
+        break;
       default:
         assertNever(
           type,

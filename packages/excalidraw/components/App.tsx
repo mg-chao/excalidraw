@@ -243,6 +243,7 @@ import {
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
+  newWatermarkElement,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -5857,7 +5858,8 @@ class App extends React.Component<AppProps, AppState> {
       type === "line" ||
       type === "freedraw" ||
       type === "text" ||
-      type === "blur"
+      type === "blur" ||
+      type === "watermark"
     );
   };
 
@@ -8254,7 +8256,8 @@ class App extends React.Component<AppProps, AppState> {
       | "ellipse"
       | "iframe"
       | "embeddable"
-      | "blur",
+      | "blur"
+      | "watermark",
   ) {
     return this.state.currentItemRoundness === "round"
       ? {
@@ -8266,7 +8269,11 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType: ExcalidrawGenericElement["type"] | "embeddable" | "blur",
+    elementType:
+      | ExcalidrawGenericElement["type"]
+      | "embeddable"
+      | "blur"
+      | "watermark",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -8308,6 +8315,12 @@ class App extends React.Component<AppProps, AppState> {
         ...baseElementAttributes,
         blur: this.state.currentItemBlur,
       });
+    } else if (elementType === "watermark") {
+      element = newWatermarkElement({
+        ...baseElementAttributes,
+        watermarkText: "",
+        watermarkFontSize: this.state.currentItemFontSize,
+      });
     } else {
       element = newElement({
         type: elementType,
@@ -8320,6 +8333,23 @@ class App extends React.Component<AppProps, AppState> {
         selectionElement: element,
       });
     } else {
+      if (element.type === "watermark") {
+        // 判断画布上是否已经有 watermark 元素
+        const watermarkElement = this.scene
+          .getNonDeletedElements()
+          .find((el) => el.type === "watermark");
+        if (watermarkElement) {
+          return;
+        }
+
+        this.scene.insertElement(element);
+        this.setState({
+          multiElement: null,
+          newElement: null,
+        });
+        return;
+      }
+
       this.scene.insertElement(element);
       this.setState({
         multiElement: null,
