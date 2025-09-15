@@ -8243,8 +8243,6 @@ class App extends React.Component<AppProps, AppState> {
         startBoundElement: boundElement,
         suggestedBindings: [],
       });
-
-      this.updateSerialNumberBindings(element);
     }
   };
 
@@ -8463,39 +8461,44 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private updateSerialNumberBindings = debounce(
-    (linearElement: LinearElementEditor | ExcalidrawLinearElement) => {
-      if (this.state.selectedLinearElement) {
-        return;
-      }
+  private updateSerialNumberBindings = (
+    linearElement: LinearElementEditor | ExcalidrawLinearElement,
+  ) => {
+    if (
+      !this.props.customOptions?.getExtraTools?.()?.includes("serialNumber")
+    ) {
+      return;
+    }
 
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      const arrowElement =
-        "elementId" in linearElement
-          ? elementsMap.get(linearElement.elementId)
-          : elementsMap.get(linearElement.id);
-      if (!arrowElement) {
-        return;
-      }
+    if (this.state.selectedLinearElement) {
+      return;
+    }
 
-      if (!(arrowElement.type === "arrow" && arrowElement.startBinding)) {
-        return;
-      }
-      const boundElement = elementsMap.get(
-        arrowElement.startBinding?.elementId,
-      );
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const arrowElement =
+      "elementId" in linearElement
+        ? elementsMap.get(linearElement.elementId)
+        : elementsMap.get(linearElement.id);
+    if (!arrowElement) {
+      return;
+    }
 
-      if (
-        !boundElement ||
-        !boundElement.id.startsWith("snow-shot_serial-number")
-      ) {
-        return;
-      }
+    if (!(arrowElement.type === "arrow" && arrowElement.startBinding)) {
+      return;
+    }
+    const boundElement = elementsMap.get(arrowElement.startBinding?.elementId);
 
-      updateBoundElements(boundElement, this.scene);
-    },
-    1000 / 60,
-  );
+    if (
+      !boundElement ||
+      !boundElement.id.startsWith("snow-shot_serial-number")
+    ) {
+      return;
+    }
+
+    updateBoundElements(boundElement, this.scene, {
+      newSize: { width: boundElement.width, height: boundElement.height },
+    });
+  };
 
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
