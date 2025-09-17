@@ -334,9 +334,9 @@ export const actionChangeStrokeColor = register({
     return (
       <>
         {appState.stylesPanelMode === "full" && (
-        <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+          <h3 aria-hidden="true">{t("labels.stroke")}</h3>
         )}
-      <ColorPicker
+        <ColorPicker
           topPicks={
             customOptions?.pickerRenders?.elementStrokeColors ??
             DEFAULT_ELEMENT_STROKE_PICKS
@@ -357,7 +357,7 @@ export const actionChangeStrokeColor = register({
           appState={appState}
           updateData={updateData}
           compactMode={appState.stylesPanelMode === "compact"}
-      />
+        />
       </>
     );
   },
@@ -421,9 +421,9 @@ export const actionChangeBackgroundColor = register({
     return (
       <>
         {appState.stylesPanelMode === "full" && (
-        <h3 aria-hidden="true">{t("labels.background")}</h3>
+          <h3 aria-hidden="true">{t("labels.background")}</h3>
         )}
-      <ColorPicker
+        <ColorPicker
           topPicks={
             customOptions?.pickerRenders?.elementBackgroundColors ??
             DEFAULT_ELEMENT_BACKGROUND_PICKS
@@ -446,7 +446,7 @@ export const actionChangeBackgroundColor = register({
           appState={appState}
           updateData={updateData}
           compactMode={appState.stylesPanelMode === "compact"}
-      />
+        />
       </>
     );
   },
@@ -547,47 +547,86 @@ export const actionChangeStrokeWidth = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
-    <fieldset>
-      {appState.stylesPanelMode === "full" && (
-        <legend>{t("labels.strokeWidth")}</legend>
-      )}
-      <div>
-        <RadioSelection
-          group="stroke-width"
-          options={[
-            {
-              value: STROKE_WIDTH.thin,
-              text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
-              testId: "strokeWidth-thin",
-            },
-            {
-              value: STROKE_WIDTH.bold,
-              text: t("labels.bold"),
-              icon: StrokeWidthBoldIcon,
-              testId: "strokeWidth-bold",
-            },
-            {
-              value: STROKE_WIDTH.extraBold,
-              text: t("labels.extraBold"),
-              icon: StrokeWidthExtraBoldIcon,
-              testId: "strokeWidth-extraBold",
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            app,
-            (element) => element.strokeWidth,
-            (element) => element.hasOwnProperty("strokeWidth"),
-            (hasSelection) =>
-              hasSelection ? null : appState.currentItemStrokeWidth,
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <fieldset>
+        {appState.stylesPanelMode === "full" && (
+          <legend>{t("labels.strokeWidth")}</legend>
+        )}
+        <div>
+          {customOptions?.pickerRenders?.ChangeStrokeWidthSlider ? (
+            <customOptions.pickerRenders.ChangeStrokeWidthSlider
+              value={getFormValue(
+                elements,
+                app,
+                (element) => element.strokeWidth,
+                (element) => element.hasOwnProperty("strokeWidth"),
+                (hasSelection) =>
+                  hasSelection ? null : appState.currentItemStrokeWidth,
+              )}
+              onChange={(value) => updateData(value)}
+              options={[
+                {
+                  value: STROKE_WIDTH.thin,
+                  text: t("labels.thin"),
+                  icon: StrokeWidthBaseIcon,
+                  testId: "strokeWidth-thin",
+                },
+                {
+                  value: STROKE_WIDTH.bold,
+                  text: t("labels.bold"),
+                  icon: StrokeWidthBoldIcon,
+                  testId: "strokeWidth-bold",
+                },
+                {
+                  value: STROKE_WIDTH.extraBold,
+                  text: t("labels.extraBold"),
+                  icon: StrokeWidthExtraBoldIcon,
+                  testId: "strokeWidth-extraBold",
+                },
+              ]}
+              group="stroke-width"
+            />
+          ) : (
+            <RadioSelection
+              group="stroke-width"
+              options={[
+                {
+                  value: STROKE_WIDTH.thin,
+                  text: t("labels.thin"),
+                  icon: StrokeWidthBaseIcon,
+                  testId: "strokeWidth-thin",
+                },
+                {
+                  value: STROKE_WIDTH.bold,
+                  text: t("labels.bold"),
+                  icon: StrokeWidthBoldIcon,
+                  testId: "strokeWidth-bold",
+                },
+                {
+                  value: STROKE_WIDTH.extraBold,
+                  text: t("labels.extraBold"),
+                  icon: StrokeWidthExtraBoldIcon,
+                  testId: "strokeWidth-extraBold",
+                },
+              ]}
+              value={getFormValue(
+                elements,
+                app,
+                (element) => element.strokeWidth,
+                (element) => element.hasOwnProperty("strokeWidth"),
+                (hasSelection) =>
+                  hasSelection ? null : appState.currentItemStrokeWidth,
+              )}
+              onChange={(value) => updateData(value)}
+            />
           )}
-          onChange={(value) => updateData(value)}
-        />
-      </div>
-    </fieldset>
-  ),
+        </div>
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeSloppiness = register({
@@ -732,77 +771,148 @@ export const actionChangeFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
-    <fieldset>
-      <legend>{t("labels.fontSize")}</legend>
-      <div>
-        <RadioSelection
-          group="font-size"
-          options={[
-            {
-              value: 16,
-              text: t("labels.small"),
-              icon: FontSizeSmallIcon,
-              testId: "fontSize-small",
-            },
-            {
-              value: 20,
-              text: t("labels.medium"),
-              icon: FontSizeMediumIcon,
-              testId: "fontSize-medium",
-            },
-            {
-              value: 28,
-              text: t("labels.large"),
-              icon: FontSizeLargeIcon,
-              testId: "fontSize-large",
-            },
-            {
-              value: 36,
-              text: t("labels.veryLarge"),
-              icon: FontSizeExtraLargeIcon,
-              testId: "fontSize-veryLarge",
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            app,
-            (element) => {
-              if (isTextElement(element)) {
-                return element.fontSize;
-              }
-              const boundTextElement = getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              );
-              if (boundTextElement) {
-                return boundTextElement.fontSize;
-              }
-              return null;
-            },
-            (element) =>
-              isTextElement(element) ||
-              getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              ) !== null,
-            (hasSelection) =>
-              hasSelection
-                ? null
-                : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fontSize")}</legend>
+        <div>
+          {customOptions?.pickerRenders?.ChangeFontSizeSlider ? (
+            <customOptions.pickerRenders.ChangeFontSizeSlider
+              group="font-size"
+              options={[
+                {
+                  value: 16,
+                  text: t("labels.small"),
+                  icon: FontSizeSmallIcon,
+                  testId: "fontSize-small",
+                },
+                {
+                  value: 20,
+                  text: t("labels.medium"),
+                  icon: FontSizeMediumIcon,
+                  testId: "fontSize-medium",
+                },
+                {
+                  value: 28,
+                  text: t("labels.large"),
+                  icon: FontSizeLargeIcon,
+                  testId: "fontSize-large",
+                },
+                {
+                  value: 36,
+                  text: t("labels.veryLarge"),
+                  icon: FontSizeExtraLargeIcon,
+                  testId: "fontSize-veryLarge",
+                },
+              ]}
+              value={getFormValue(
+                elements,
+                app,
+                (element) => {
+                  if (isTextElement(element)) {
+                    return element.fontSize;
+                  }
+                  const boundTextElement = getBoundTextElement(
+                    element,
+                    app.scene.getNonDeletedElementsMap(),
+                  );
+                  if (boundTextElement) {
+                    return boundTextElement.fontSize;
+                  }
+                  return null;
+                },
+                (element) =>
+                  isTextElement(element) ||
+                  getBoundTextElement(
+                    element,
+                    app.scene.getNonDeletedElementsMap(),
+                  ) !== null,
+                (hasSelection) =>
+                  hasSelection
+                    ? null
+                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+              )}
+              onChange={(value) => {
+                withCaretPositionPreservation(
+                  () => updateData(value),
+                  appState.stylesPanelMode === "compact",
+                  !!appState.editingTextElement,
+                  data?.onPreventClose,
+                );
+              }}
+            />
+          ) : (
+            <RadioSelection
+              group="font-size"
+              options={[
+                {
+                  value: 16,
+                  text: t("labels.small"),
+                  icon: FontSizeSmallIcon,
+                  testId: "fontSize-small",
+                },
+                {
+                  value: 20,
+                  text: t("labels.medium"),
+                  icon: FontSizeMediumIcon,
+                  testId: "fontSize-medium",
+                },
+                {
+                  value: 28,
+                  text: t("labels.large"),
+                  icon: FontSizeLargeIcon,
+                  testId: "fontSize-large",
+                },
+                {
+                  value: 36,
+                  text: t("labels.veryLarge"),
+                  icon: FontSizeExtraLargeIcon,
+                  testId: "fontSize-veryLarge",
+                },
+              ]}
+              value={getFormValue(
+                elements,
+                app,
+                (element) => {
+                  if (isTextElement(element)) {
+                    return element.fontSize;
+                  }
+                  const boundTextElement = getBoundTextElement(
+                    element,
+                    app.scene.getNonDeletedElementsMap(),
+                  );
+                  if (boundTextElement) {
+                    return boundTextElement.fontSize;
+                  }
+                  return null;
+                },
+                (element) =>
+                  isTextElement(element) ||
+                  getBoundTextElement(
+                    element,
+                    app.scene.getNonDeletedElementsMap(),
+                  ) !== null,
+                (hasSelection) =>
+                  hasSelection
+                    ? null
+                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+              )}
+              onChange={(value) => {
+                withCaretPositionPreservation(
+                  () => updateData(value),
+                  appState.stylesPanelMode === "compact",
+                  !!appState.editingTextElement,
+                  data?.onPreventClose,
+                );
+              }}
+            />
           )}
-          onChange={(value) => {
-            withCaretPositionPreservation(
-              () => updateData(value),
-              appState.stylesPanelMode === "compact",
-              !!appState.editingTextElement,
-              data?.onPreventClose,
-            );
-          }}
-        />
-      </div>
-    </fieldset>
-  ),
+        </div>
+      </fieldset>
+    );
+  },
 });
 
 export const actionDecreaseFontSize = register({
