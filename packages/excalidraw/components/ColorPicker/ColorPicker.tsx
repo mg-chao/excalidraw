@@ -1,6 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useEffect } from "react";
 
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
@@ -18,12 +18,17 @@ import { useExcalidrawContainer } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
-import { slashIcon } from "../icons";
+import { backgroundIcon, slashIcon, strokeIcon } from "../icons";
 
 import {
   ExcalidrawPropsCustomOptionsContext,
   type AppState,
 } from "../../types";
+import {
+  saveCaretPosition,
+  restoreCaretPosition,
+  temporarilyDisableTextEditorBlur,
+} from "../../hooks/useTextEditorFocus";
 
 import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
@@ -70,6 +75,7 @@ interface ColorPickerProps {
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
+  compactMode?: boolean;
 }
 
 const ColorPickerPopupContent = ({
@@ -80,6 +86,8 @@ const ColorPickerPopupContent = ({
   elements,
   palette = COLOR_PALETTE,
   updateData,
+  getOpenPopup,
+  appState,
 }: Pick<
   ColorPickerProps,
   | "type"
@@ -89,7 +97,10 @@ const ColorPickerPopupContent = ({
   | "elements"
   | "palette"
   | "updateData"
->) => {
+  | "appState"
+> & {
+  getOpenPopup: () => AppState["openPopup"];
+}) => {
   const { container } = useExcalidrawContainer();
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
@@ -120,6 +131,8 @@ const ColorPickerPopupContent = ({
     <PropertiesPopover
       container={container}
       style={{ maxWidth: "13rem" }}
+      // Improve focus handling for text editing scenarios
+      preventAutoFocusOnTouch={!!appState.editingTextElement}
       onFocusOutside={(event) => {
         // refocus due to eye dropper
         focusPickerContent();
@@ -134,8 +147,23 @@ const ColorPickerPopupContent = ({
         }
       }}
       onClose={() => {
-        updateData({ openPopup: null });
+        // only clear if we're still the active popup (avoid racing with switch)
+        if (getOpenPopup() === type) {
+          updateData({ openPopup: null });
+        }
         setActiveColorPickerSection(null);
+
+        // Refocus text editor when popover closes if we were editing text
+        if (appState.editingTextElement) {
+          setTimeout(() => {
+            const textEditor = document.querySelector(
+              ".excalidraw-wysiwyg",
+            ) as HTMLTextAreaElement;
+            if (textEditor) {
+              textEditor.focus();
+            }
+          }, 0);
+        }
       }}
     >
       {palette ? (
@@ -144,7 +172,17 @@ const ColorPickerPopupContent = ({
           palette={palette}
           color={color}
           onChange={(changedColor) => {
+            // Save caret position before color change if editing text
+            const savedSelection = appState.editingTextElement
+              ? saveCaretPosition()
+              : null;
+
             onChange(changedColor);
+
+            // Restore caret position after color change if editing text
+            if (appState.editingTextElement && savedSelection) {
+              restoreCaretPosition(savedSelection);
+            }
           }}
           onEyeDropperToggle={(force) => {
             setEyeDropperState((state) => {
@@ -171,6 +209,7 @@ const ColorPickerPopupContent = ({
             if (eyeDropperState) {
               setEyeDropperState(null);
             } else {
+              // close explicitly on Escape
               updateData({ openPopup: null });
             }
           }}
@@ -191,11 +230,32 @@ const ColorPickerTrigger = ({
   label,
   color,
   type,
+  compactMode = false,
+  mode = "background",
+  onToggle,
+  editingTextElement,
 }: {
   color: string | null;
   label: string;
   type: ColorPickerType;
+  compactMode?: boolean;
+  mode?: "background" | "stroke";
+  onToggle: () => void;
+  editingTextElement?: boolean;
 }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    // use pointerdown so we run before outside-close logic
+    e.preventDefault();
+    e.stopPropagation();
+
+    // If editing text, temporarily disable the wysiwyg blur event
+    if (editingTextElement) {
+      temporarilyDisableTextEditorBlur();
+    }
+
+    onToggle();
+  };
+
   return (
     <Popover.Trigger
       type="button"
@@ -211,8 +271,37 @@ const ColorPickerTrigger = ({
           ? t("labels.showStroke")
           : t("labels.showBackground")
       }
+      data-openpopup={type}
+      onClick={handleClick}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
+      {compactMode && color && (
+        <div className="color-picker__button-background">
+          {mode === "background" ? (
+            <span
+              style={{
+                color:
+                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                    ? "#fff"
+                    : "#111",
+              }}
+            >
+              {backgroundIcon}
+            </span>
+          ) : (
+            <span
+              style={{
+                color:
+                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                    ? "#fff"
+                    : "#111",
+              }}
+            >
+              {strokeIcon}
+            </span>
+          )}
+        </div>
+      )}
     </Popover.Trigger>
   );
 };
@@ -227,6 +316,7 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
+  compactMode = false,
 }: ColorPickerProps) => {
   const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
 
@@ -247,11 +337,32 @@ export const ColorPicker = ({
       <Popover.Root
         open={appState.openPopup === type}
         onOpenChange={(open) => {
-          updateData({ openPopup: open ? type : null });
+          if (open) {
+            updateData({ openPopup: type });
+          }
         }}
       >
         {/* serves as an active color indicator as well */}
-        <ColorPickerTrigger color={color} label={label} type={type} />
+        <ColorPickerTrigger
+          color={color}
+          label={label}
+          type={type}
+          compactMode={compactMode}
+          mode={type === "elementStroke" ? "stroke" : "background"}
+          editingTextElement={!!appState.editingTextElement}
+          onToggle={() => {
+            // atomic switch: if another popup is open, close it first, then open this one next tick
+            if (appState.openPopup === type) {
+              // toggle off on same trigger
+              updateData({ openPopup: null });
+            } else if (appState.openPopup) {
+              updateData({ openPopup: type });
+            } else {
+              // open this one
+              updateData({ openPopup: type });
+            }
+          }}
+        />
         {/* popup content */}
         {appState.openPopup === type && (
           <ColorPickerPopupContent
@@ -262,22 +373,36 @@ export const ColorPicker = ({
             elements={elements}
             palette={palette}
             updateData={updateData}
+            getOpenPopup={() => openRef.current}
+            appState={appState}
           />
         )}
       </Popover.Root>
     );
   };
 
+  const openRef = useRef(appState.openPopup);
+  useEffect(() => {
+    openRef.current = appState.openPopup;
+  }, [appState.openPopup]);
   return (
     <div>
-      <div role="dialog" aria-modal="true" className="color-picker-container">
-        <TopPicks
-          activeColor={color}
-          onChange={onChange}
-          type={type}
-          topPicks={topPicks}
-        />
-        <ButtonSeparator />
+      <div
+        role="dialog"
+        aria-modal="true"
+        className={clsx("color-picker-container", {
+          "color-picker-container--no-top-picks": compactMode,
+        })}
+      >
+        {!compactMode && (
+          <TopPicks
+            activeColor={color}
+            onChange={onChange}
+            type={type}
+            topPicks={topPicks}
+          />
+        )}
+        {!compactMode && <ButtonSeparator />}
         {renderPopover()}
       </div>
     </div>
