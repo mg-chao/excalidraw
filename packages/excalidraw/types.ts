@@ -575,6 +575,18 @@ export interface ExcalidrawPropsCustomOptions {
   };
   getExtraTools?: () => string[];
   pickerRenders?: {
+    ChangeStrokeWidthSlider?: React.ComponentType<{
+      value: number | null;
+      onChange: (value: number) => void;
+      options: React.ComponentProps<typeof RadioSelection>["options"];
+      group: string;
+    }>;
+    ChangeFontSizeSlider?: React.ComponentType<{
+      value: number | null;
+      onChange: (value: number) => void;
+      options: React.ComponentProps<typeof RadioSelection>["options"];
+      group: string;
+    }>;
     SubToolEditor?: React.ComponentType<{
       appState: UIAppState;
       targetElements: ExcalidrawElement[];
