@@ -68,7 +68,7 @@ export const isIframeLikeElement = (
 };
 
 export const isTextElement = (
-  element: ExcalidrawElement | null,
+  element: ExcalidrawElement | null | undefined,
 ): element is ExcalidrawTextElement => {
   return element != null && element.type === "text";
 };

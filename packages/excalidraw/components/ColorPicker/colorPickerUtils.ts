@@ -57,6 +57,7 @@ export const getMostUsedCustomColors = (
   const elementColorTypeMap = {
     elementBackground: "backgroundColor",
     elementStroke: "strokeColor",
+    elementTextStroke: "textStrokeColor",
   };
 
   const colors = elements.filter((element) => {
@@ -156,4 +157,5 @@ export const isColorDark = (color: string, threshold = 160): boolean => {
 export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"
-  | "elementStroke";
+  | "elementStroke"
+  | "elementTextStroke";

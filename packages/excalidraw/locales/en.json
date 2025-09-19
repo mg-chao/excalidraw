@@ -21,6 +21,8 @@
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
+    "textStroke": "Text stroke",
+    "textStrokeWidth": "Text stroke width",
     "changeStroke": "Change stroke color",
     "background": "Background",
     "changeBackground": "Change background color",

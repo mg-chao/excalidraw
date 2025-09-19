@@ -10,6 +10,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  hasTextStrokeColor,
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
 } from "@excalidraw/element";
@@ -125,6 +126,26 @@ export const canChangeStrokeColor = (
   );
 };
 
+export const canChangeTextStrokeColor = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  let commonSelectedType: ExcalidrawElementType | null =
+    targetElements[0]?.type || null;
+
+  for (const element of targetElements) {
+    if (element.type !== commonSelectedType) {
+      commonSelectedType = null;
+      break;
+    }
+  }
+
+  return (
+    hasTextStrokeColor(appState.activeTool.type) ||
+    targetElements.some((element) => hasTextStrokeColor(element.type))
+  );
+};
+
 export const canChangeBackgroundColor = (
   appState: UIAppState,
   targetElements: ExcalidrawElement[],
@@ -222,6 +243,14 @@ export const SelectedShapeActions = ({
         extraHasBackgroundTool) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
+      <div>
+        {canChangeStrokeColor(appState, targetElements) &&
+          renderAction("changeTextStrokeColor")}
+      </div>
+      <div>
+        {canChangeStrokeColor(appState, targetElements) &&
+          renderAction("changeTextStrokeWidth")}
+      </div>
 
       {customOptions?.pickerRenders?.SubToolEditor && (
         <customOptions.pickerRenders.SubToolEditor

@@ -21,6 +21,8 @@
     "copyStyles": "複製樣式",
     "pasteStyles": "貼上樣式",
     "stroke": "筆畫",
+    "textStroke": "文字筆畫",
+    "textStrokeWidth": "文字筆畫寬度",
     "background": "背景",
     "fill": "填滿",
     "strokeWidth": "筆跡寬度",
