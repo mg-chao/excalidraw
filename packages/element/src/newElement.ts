@@ -293,6 +293,8 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
+    textStrokeColor?: ExcalidrawTextElement["textStrokeColor"];
+    textStrokeWidth?: ExcalidrawTextElement["textStrokeWidth"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -326,6 +328,8 @@ export const newTextElement = (
     originalText: opts.originalText ?? text,
     autoResize: opts.autoResize ?? true,
     lineHeight,
+    textStrokeColor: opts.textStrokeColor || "transparent",
+    textStrokeWidth: opts.textStrokeWidth || 0,
   };
 
   const textElement: ExcalidrawTextElement = newElementWith(

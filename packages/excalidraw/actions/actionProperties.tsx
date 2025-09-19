@@ -23,7 +23,11 @@ import {
   reduceToCommonValue,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import {
+  canBecomePolygon,
+  getNonDeletedElements,
+  hasTextStrokeColor,
+} from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -84,7 +88,7 @@ import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
-import { Range } from "../components/Range";
+import { Range, TextStrokeWidthRange } from "../components/Range";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
@@ -353,6 +357,91 @@ export const actionChangeStrokeColor = register({
               !hasSelection ? appState.currentItemStrokeColor : null,
           )}
           onChange={(color) => updateData({ currentItemStrokeColor: color })}
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+          compactMode={appState.stylesPanelMode === "compact"}
+        />
+      </>
+    );
+  },
+});
+
+export const actionChangeTextStrokeColor = register({
+  name: "changeTextStrokeColor",
+  label: "labels.textStroke",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      ...(value.currentItemTextStrokeColor && {
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => {
+            return hasTextStrokeColor(el.type)
+              ? newElementWith(el as ExcalidrawTextElement, {
+                  textStrokeColor: value.currentItemTextStrokeColor,
+                })
+              : el;
+          },
+          true,
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: !!value.currentItemTextStrokeColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <>
+        {appState.stylesPanelMode === "full" && (
+          <h3 aria-hidden="true">{t("labels.textStroke")}</h3>
+        )}
+        <ColorPicker
+          topPicks={
+            customOptions?.pickerRenders?.elementBackgroundColors ??
+            DEFAULT_ELEMENT_BACKGROUND_PICKS
+          }
+          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          type="elementTextStroke"
+          label={t("labels.textStroke")}
+          color={getFormValue(
+            elements,
+            app,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.textStrokeColor;
+              }
+              const boundTextElement = getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              );
+              if (boundTextElement) {
+                return boundTextElement.textStrokeColor;
+              }
+              return null;
+            },
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              ) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemTextStrokeColor || "transparent",
+          )}
+          onChange={(color) =>
+            updateData({ currentItemTextStrokeColor: color })
+          }
           elements={elements}
           appState={appState}
           updateData={updateData}
@@ -737,6 +826,39 @@ export const actionChangeStrokeStyle = register({
         />
       </div>
     </fieldset>
+  ),
+});
+
+export const actionChangeTextStrokeWidth = register({
+  name: "changeTextStrokeWidth",
+  label: "labels.textStrokeWidth",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) => {
+          if (!isTextElement(el)) {
+            return el;
+          }
+
+          return newElementWith(el, {
+            textStrokeWidth: value,
+          });
+        },
+        true,
+      ),
+      appState: { ...appState, currentItemTextStrokeWidth: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ app, updateData }) => (
+    <TextStrokeWidthRange
+      updateData={updateData}
+      app={app}
+      testId="textStrokeWidth"
+    />
   ),
 });
 

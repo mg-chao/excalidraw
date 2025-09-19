@@ -8,6 +8,7 @@ import { ExcalidrawPropsCustomOptionsContext } from "../types";
 import "./Range.scss";
 
 import type { AppClassProperties } from "../types";
+import { isTextElement } from "@excalidraw/element";
 
 export type RangeProps = {
   updateData: (value: number) => void;
@@ -149,6 +150,94 @@ export const BlurRange = ({ updateData, app, testId }: RangeProps) => {
           <input
             style={{
               ["--color-slider-track" as string]: hasCommonBlur
+                ? undefined
+                : "var(--button-bg)",
+            }}
+            ref={rangeRef}
+            type="range"
+            min="0"
+            max="100"
+            step="10"
+            onChange={(event) => {
+              updateData(+event.target.value);
+            }}
+            value={value}
+            className="range-input"
+            data-testid={testId}
+          />
+          <div className="value-bubble" ref={valueRef}>
+            {value !== 0 ? value : null}
+          </div>
+          <div className="zero-label">0</div>
+        </div>
+      )}
+    </label>
+  );
+};
+
+export const TextStrokeWidthRange = ({
+  updateData,
+  app,
+  testId,
+}: RangeProps) => {
+  const rangeRef = React.useRef<HTMLInputElement>(null);
+  const valueRef = React.useRef<HTMLDivElement>(null);
+  const selectedElements = app.scene.getSelectedElements(app.state);
+  let hasCommonTextStrokeWidth = true;
+  const firstElement = selectedElements.at(0);
+  const leastCommonTextStrokeWidth = selectedElements.reduce(
+    (acc, element) => {
+      if (!isTextElement(element)) {
+        return acc;
+      }
+
+      if (acc != null && acc !== element.textStrokeWidth) {
+        hasCommonTextStrokeWidth = false;
+      }
+      if (acc == null || acc > element.textStrokeWidth) {
+        return element.textStrokeWidth;
+      }
+      return acc;
+    },
+    isTextElement(firstElement) ? firstElement.textStrokeWidth : null,
+  );
+
+  const value =
+    leastCommonTextStrokeWidth ?? app.state.currentItemTextStrokeWidth;
+
+  useEffect(() => {
+    if (rangeRef.current && valueRef.current) {
+      const rangeElement = rangeRef.current;
+      const valueElement = valueRef.current;
+      const inputWidth = rangeElement.offsetWidth;
+      const thumbWidth = 15; // 15 is the width of the thumb
+      const position =
+        (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
+      valueElement.style.left = `${position}px`;
+      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+    }
+  }, [value]);
+
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+  return (
+    <label className="control-label">
+      {t("labels.textStrokeWidth")}
+      {customOptions?.pickerRenders?.rangeRender ? (
+        customOptions?.pickerRenders?.rangeRender({
+          value,
+          onChange: (value: number) => {
+            updateData(value);
+          },
+          step: 10,
+          min: 0,
+          max: 100,
+        })
+      ) : (
+        <div className="range-wrapper">
+          <input
+            style={{
+              ["--color-slider-track" as string]: hasCommonTextStrokeWidth
                 ? undefined
                 : "var(--button-bg)",
             }}

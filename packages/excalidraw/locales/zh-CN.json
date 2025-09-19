@@ -21,6 +21,8 @@
     "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
+    "textStroke": "文本描边",
+    "textStrokeWidth": "文本描边宽度",
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",

@@ -61,6 +61,8 @@ export type ActionName =
   | "objectsSnapMode"
   | "stats"
   | "changeStrokeColor"
+  | "changeTextStrokeColor"
+  | "changeTextStrokeWidth"
   | "changeBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"

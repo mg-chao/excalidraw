@@ -257,6 +257,10 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    /// 文本描边颜色
+    textStrokeColor: string;
+    /** 文本描边宽度 */
+    textStrokeWidth: number;
     /**
      * If `true` the width will fit the text. If `false`, the text will
      * wrap to fit the width.

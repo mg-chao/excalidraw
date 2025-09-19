@@ -425,6 +425,7 @@ const drawElementOnCanvas = (
       rc.draw(ShapeCache.get(element)!);
       break;
     }
+    // 渲染
     // Blur 和 Watermark 都放到 Snow Shot 上渲染
     case "blur":
     case "watermark":
@@ -534,6 +535,41 @@ const drawElementOnCanvas = (
           element.fontSize,
           lineHeightPx,
         );
+
+        for (let index = 0; index < lines.length; index++) {
+          if (element.backgroundColor !== "transparent") {
+            const saveFillColor: string | CanvasGradient | CanvasPattern =
+              context.fillStyle;
+            context.fillStyle = element.backgroundColor;
+            context.fillRect(
+              0,
+              -Math.ceil(element.height / 10 / 5),
+              element.width,
+              element.height,
+            );
+            context.fillStyle = saveFillColor;
+          }
+        }
+        for (let index = 0; index < lines.length; index++) {
+          if (element.textStrokeColor !== "transparent") {
+            const saveStrokeColor: string | CanvasGradient | CanvasPattern =
+              context.strokeStyle;
+            const saveLineWidth = context.lineWidth;
+            context.strokeStyle = element.textStrokeColor;
+            context.lineWidth =
+              (lineHeightPx * ((element.textStrokeWidth ?? 0) / 100)) / 3;
+            const saveLineJoin = context.lineJoin;
+            context.lineJoin = "round";
+            context.strokeText(
+              lines[index],
+              horizontalOffset,
+              index * lineHeightPx + verticalOffset,
+            );
+            context.strokeStyle = saveStrokeColor;
+            context.lineJoin = saveLineJoin;
+            context.lineWidth = saveLineWidth;
+          }
+        }
 
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
