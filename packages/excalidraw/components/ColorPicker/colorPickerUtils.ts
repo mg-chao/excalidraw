@@ -51,7 +51,7 @@ export const isCustomColor = ({
 
 export const getMostUsedCustomColors = (
   elements: readonly ExcalidrawElement[],
-  type: "elementBackground" | "elementStroke",
+  type: "elementBackground" | "elementStroke" | "elementTextStroke",
   palette: ColorPaletteCustom,
 ) => {
   const elementColorTypeMap = {

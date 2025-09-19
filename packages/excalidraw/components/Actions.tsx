@@ -243,14 +243,12 @@ export const SelectedShapeActions = ({
         extraHasBackgroundTool) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
-      <div>
-        {canChangeStrokeColor(appState, targetElements) &&
-          renderAction("changeTextStrokeColor")}
-      </div>
-      <div>
-        {canChangeStrokeColor(appState, targetElements) &&
-          renderAction("changeTextStrokeWidth")}
-      </div>
+      {canChangeTextStrokeColor(appState, targetElements) && (
+        <div>{renderAction("changeTextStrokeColor")}</div>
+      )}
+      {canChangeTextStrokeColor(appState, targetElements) && (
+        <div>{renderAction("changeTextStrokeWidth")}</div>
+      )}
 
       {customOptions?.pickerRenders?.SubToolEditor && (
         <customOptions.pickerRenders.SubToolEditor
