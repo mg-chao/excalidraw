@@ -22,6 +22,7 @@
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
     "textStroke": "文本描边",
+    "textBackgroundColor": "文本背景色",
     "textStrokeWidth": "文本描边宽度",
     "background": "背景",
     "fill": "填充",

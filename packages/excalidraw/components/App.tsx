@@ -5467,6 +5467,7 @@ class App extends React.Component<AppProps, AppState> {
         y: parentCenterPosition ? parentCenterPosition.elementCenterY : sceneY,
         strokeColor: this.state.currentItemStrokeColor,
         textStrokeColor: this.state.currentItemTextStrokeColor,
+        textBackgroundColor: this.state.currentItemTextBackgroundColor,
         textStrokeWidth: this.state.currentItemTextStrokeWidth,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,

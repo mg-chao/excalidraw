@@ -536,10 +536,10 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
-        if (element.backgroundColor !== "transparent") {
+        if (element.textBackgroundColor !== "transparent") {
           const saveFillColor: string | CanvasGradient | CanvasPattern =
             context.fillStyle;
-          context.fillStyle = element.backgroundColor;
+          context.fillStyle = element.textBackgroundColor;
           context.fillRect(
             0,
             -Math.ceil(element.height / 10 / 5),

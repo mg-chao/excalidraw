@@ -244,6 +244,9 @@ export const SelectedShapeActions = ({
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
       {canChangeTextStrokeColor(appState, targetElements) && (
+        <div>{renderAction("changeTextBackgroundColor")}</div>
+      )}
+      {canChangeTextStrokeColor(appState, targetElements) && (
         <div>{renderAction("changeTextStrokeColor")}</div>
       )}
       {canChangeTextStrokeColor(appState, targetElements) && (

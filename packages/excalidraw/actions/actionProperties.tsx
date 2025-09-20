@@ -452,6 +452,91 @@ export const actionChangeTextStrokeColor = register({
   },
 });
 
+export const actionChangeTextBackgroundColor = register({
+  name: "changeTextBackgroundColor",
+  label: "labels.textBackgroundColor",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      ...(value.currentItemTextBackgroundColor && {
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => {
+            return hasTextStrokeColor(el.type)
+              ? newElementWith(el as ExcalidrawTextElement, {
+                  textBackgroundColor: value.currentItemTextBackgroundColor,
+                })
+              : el;
+          },
+          true,
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: !!value.currentItemTextBackgroundColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <>
+        {appState.stylesPanelMode === "full" && (
+          <h3 aria-hidden="true">{t("labels.textBackgroundColor")}</h3>
+        )}
+        <ColorPicker
+          topPicks={
+            customOptions?.pickerRenders?.elementBackgroundColors ??
+            DEFAULT_ELEMENT_BACKGROUND_PICKS
+          }
+          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          type="elementTextBackgroundColor"
+          label={t("labels.textBackgroundColor")}
+          color={getFormValue(
+            elements,
+            app,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.textBackgroundColor;
+              }
+              const boundTextElement = getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              );
+              if (boundTextElement) {
+                return boundTextElement.textBackgroundColor;
+              }
+              return null;
+            },
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              ) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemTextBackgroundColor || "transparent",
+          )}
+          onChange={(color) =>
+            updateData({ currentItemTextBackgroundColor: color })
+          }
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+          compactMode={appState.stylesPanelMode === "compact"}
+        />
+      </>
+    );
+  },
+});
+
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   label: "labels.changeBackground",

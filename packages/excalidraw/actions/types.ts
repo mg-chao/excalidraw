@@ -62,6 +62,7 @@ export type ActionName =
   | "stats"
   | "changeStrokeColor"
   | "changeTextStrokeColor"
+  | "changeTextBackgroundColor"
   | "changeTextStrokeWidth"
   | "changeBackgroundColor"
   | "changeFillStyle"
