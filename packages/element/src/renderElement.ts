@@ -536,22 +536,24 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
-        for (let index = 0; index < lines.length; index++) {
-          if (element.backgroundColor !== "transparent") {
-            const saveFillColor: string | CanvasGradient | CanvasPattern =
-              context.fillStyle;
-            context.fillStyle = element.backgroundColor;
-            context.fillRect(
-              0,
-              -Math.ceil(element.height / 10 / 5),
-              element.width,
-              element.height,
-            );
-            context.fillStyle = saveFillColor;
-          }
+        if (element.backgroundColor !== "transparent") {
+          const saveFillColor: string | CanvasGradient | CanvasPattern =
+            context.fillStyle;
+          context.fillStyle = element.backgroundColor;
+          context.fillRect(
+            0,
+            -Math.ceil(element.height / 10 / 5),
+            element.width,
+            element.height,
+          );
+          context.fillStyle = saveFillColor;
         }
-        for (let index = 0; index < lines.length; index++) {
-          if (element.textStrokeColor !== "transparent") {
+        if (
+          element.textStrokeColor !== "transparent" &&
+          element.textStrokeWidth &&
+          element.textStrokeWidth > 0
+        ) {
+          for (let index = 0; index < lines.length; index++) {
             const saveStrokeColor: string | CanvasGradient | CanvasPattern =
               context.strokeStyle;
             const saveLineWidth = context.lineWidth;

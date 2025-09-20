@@ -229,7 +229,7 @@ export const TextStrokeWidthRange = ({
           onChange: (value: number) => {
             updateData(value);
           },
-          step: 10,
+          step: 2,
           min: 0,
           max: 100,
         })
@@ -245,7 +245,7 @@ export const TextStrokeWidthRange = ({
             type="range"
             min="0"
             max="100"
-            step="10"
+            step="2"
             onChange={(event) => {
               updateData(+event.target.value);
             }}
