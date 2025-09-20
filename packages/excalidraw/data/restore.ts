@@ -291,6 +291,7 @@ export const restoreElement = (
         lineHeight,
         textStrokeColor: element.textStrokeColor || "transparent",
         textStrokeWidth: element.textStrokeWidth || 0,
+        textBackgroundColor: element.textBackgroundColor || "transparent",
       });
 
       // if empty text, mark as deleted. We keep in array
