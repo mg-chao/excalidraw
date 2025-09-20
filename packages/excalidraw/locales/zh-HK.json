@@ -22,6 +22,7 @@
     "pasteStyles": "套用樣式",
     "stroke": "筆跡顏色",
     "textStroke": "文字筆跡顏色",
+    "textBackgroundColor": "文字背景色",
     "textStrokeWidth": "文字筆跡寬度",
     "background": "填充顏色",
     "fill": "背景樣式",

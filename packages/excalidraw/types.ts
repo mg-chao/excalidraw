@@ -334,6 +334,7 @@ export interface AppState {
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
+  currentItemTextBackgroundColor: string;
   currentItemTextStrokeColor: string;
   currentItemTextStrokeWidth: number;
   currentItemBackgroundColor: string;

@@ -22,6 +22,7 @@
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
     "textStroke": "Text stroke",
+    "textBackgroundColor": "Text background color",
     "textStrokeWidth": "Text stroke width",
     "changeStroke": "Change stroke color",
     "background": "Background",

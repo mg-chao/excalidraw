@@ -261,6 +261,8 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     textStrokeColor: string;
     /** 文本描边宽度 */
     textStrokeWidth: number;
+    /** 文本背景色 */
+    textBackgroundColor: string;
     /**
      * If `true` the width will fit the text. If `false`, the text will
      * wrap to fit the width.
