@@ -260,7 +260,7 @@ export const textWysiwyg = ({
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
 
-      const padding = 16;
+      const padding = 10;
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
