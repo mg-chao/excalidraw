@@ -107,6 +107,7 @@ import {
   MQ_MAX_MOBILE,
   MQ_MIN_TABLET,
   MQ_MAX_TABLET,
+  TEXT_COLLISION_THRESHOLD,
 } from "@excalidraw/common";
 
 import {
@@ -5170,15 +5171,21 @@ class App extends React.Component<AppProps, AppState> {
     ) & {
       preferSelected?: boolean;
     },
+    ignoreTextCollisionThreshold = false,
   ): NonDeleted<ExcalidrawElement> | null {
     let allHitElements: NonDeleted<ExcalidrawElement>[] = [];
     if (opts && "allHitElements" in opts) {
       allHitElements = opts?.allHitElements || [];
     } else {
-      allHitElements = this.getElementsAtPosition(x, y, {
-        includeBoundTextElement: opts?.includeBoundTextElement,
-        includeLockedElements: opts?.includeLockedElements,
-      });
+      allHitElements = this.getElementsAtPosition(
+        x,
+        y,
+        {
+          includeBoundTextElement: opts?.includeBoundTextElement,
+          includeLockedElements: opts?.includeLockedElements,
+        },
+        ignoreTextCollisionThreshold,
+      );
     }
 
     if (allHitElements.length > 1) {
@@ -5199,7 +5206,11 @@ class App extends React.Component<AppProps, AppState> {
         element: elementWithHighestZIndex,
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
-        threshold: this.getElementHitThreshold(elementWithHighestZIndex) / 2,
+        threshold:
+          this.getElementHitThreshold(
+            elementWithHighestZIndex,
+            ignoreTextCollisionThreshold,
+          ) / 2,
         elementsMap: this.scene.getNonDeletedElementsMap(),
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
@@ -5223,6 +5234,7 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement?: boolean;
       includeLockedElements?: boolean;
     },
+    ignoreTextCollisionThreshold = false,
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
 
@@ -5240,7 +5252,9 @@ class App extends React.Component<AppProps, AppState> {
                   !(isTextElement(element) && element.containerId)),
             )
     )
-      .filter((el) => this.hitElement(x, y, el))
+      .filter((el) =>
+        this.hitElement(x, y, el, false, ignoreTextCollisionThreshold),
+      )
       .filter((element) => {
         // hitting a frame's element from outside the frame is not considered a hit
         const containingFrame = getContainingFrame(element, elementsMap);
@@ -5266,13 +5280,20 @@ class App extends React.Component<AppProps, AppState> {
     return elements;
   }
 
-  getElementHitThreshold(element: ExcalidrawElement) {
+  getElementHitThreshold(
+    element: ExcalidrawElement,
+    ignoreTextCollisionThreshold = false,
+  ) {
     return Math.max(
       element.strokeWidth / 2 + 0.1,
       // NOTE: Here be dragons. Do not go under the 0.63 multiplier unless you're
       // willing to test extensively. The hit testing starts to become unreliable
       // due to FP imprecision under 0.63 in high zoom levels.
-      0.85 * (DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value),
+      0.85 *
+        ((isTextElement(element) && !ignoreTextCollisionThreshold
+          ? TEXT_COLLISION_THRESHOLD
+          : DEFAULT_COLLISION_THRESHOLD) /
+          this.state.zoom.value),
     );
   }
 
@@ -5281,6 +5302,7 @@ class App extends React.Component<AppProps, AppState> {
     y: number,
     element: ExcalidrawElement,
     considerBoundingBox = true,
+    ignoreTextCollisionThreshold = false,
   ) {
     // if the element is selected, then hit test is done against its bounding box
     if (
@@ -5295,7 +5317,7 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom(x, y),
           element,
           this.scene.getNonDeletedElementsMap(),
-          this.getElementHitThreshold(element),
+          this.getElementHitThreshold(element, ignoreTextCollisionThreshold),
         )
       ) {
         return true;
@@ -5315,7 +5337,10 @@ class App extends React.Component<AppProps, AppState> {
     return hitElementItself({
       point: pointFrom(x, y),
       element,
-      threshold: this.getElementHitThreshold(element),
+      threshold: this.getElementHitThreshold(
+        element,
+        ignoreTextCollisionThreshold,
+      ),
       elementsMap: this.scene.getNonDeletedElementsMap(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
@@ -6335,9 +6360,23 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
+        const textHitElement = this.getElementAtPosition(
+          scenePointerX,
+          scenePointerY,
+          {
+            preferSelected: true,
+            includeLockedElements: true,
+          },
+          true,
+        );
+
         setCursor(
           this.interactiveCanvas,
-          isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
+          isTextElement(hitElement)
+            ? isTextElement(textHitElement)
+              ? CURSOR_TYPE.TEXT
+              : CURSOR_TYPE.MOVE
+            : CURSOR_TYPE.CROSSHAIR,
         );
       } else if (this.state.viewModeEnabled) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);

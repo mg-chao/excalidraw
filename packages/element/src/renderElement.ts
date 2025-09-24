@@ -540,11 +540,12 @@ const drawElementOnCanvas = (
           const saveFillColor: string | CanvasGradient | CanvasPattern =
             context.fillStyle;
           context.fillStyle = element.textBackgroundColor;
+          const padding = 12;
           context.fillRect(
-            0,
-            -Math.ceil(element.height / 10 / 5),
-            element.width,
-            element.height,
+            0 - padding,
+            -Math.ceil(element.height / 10 / 5) - padding,
+            element.width + padding * 2,
+            element.height + padding * 2,
           );
           context.fillStyle = saveFillColor;
         }

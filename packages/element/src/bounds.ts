@@ -2,9 +2,11 @@ import rough from "roughjs/bin/rough";
 
 import {
   arrayToMap,
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
   invariant,
   rescalePoints,
   sizeOf,
+  TEXT_TRANSFORM_HANDLE_SPACING,
 } from "@excalidraw/common";
 
 import {
@@ -288,6 +290,7 @@ export const getElementAbsoluteCoords = (
       ];
     }
   }
+
   return [
     element.x,
     element.y,
