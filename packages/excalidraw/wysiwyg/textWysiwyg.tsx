@@ -11,6 +11,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getFontStrokeWidth,
   originalContainerCache,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
@@ -280,6 +281,14 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
+        fontWeight: "bold",
+        "-webkit-text-stroke": `${getFontStrokeWidth(
+          updatedTextElement.fontSize,
+          updatedTextElement.lineHeight,
+          updatedTextElement.textStrokeWidth,
+        )}px ${updatedTextElement.textStrokeColor}`,
+        backgroundColor: updatedTextElement.textBackgroundColor,
+        "paint-order": "stroke fill",
       });
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
