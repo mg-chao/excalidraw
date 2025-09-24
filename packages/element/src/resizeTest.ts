@@ -5,7 +5,10 @@ import {
   type Radians,
 } from "@excalidraw/math";
 
-import { SIDE_RESIZING_THRESHOLD } from "@excalidraw/common";
+import {
+  SIDE_RESIZING_THRESHOLD,
+  TEXT_SIDE_RESIZING_THRESHOLD,
+} from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 
@@ -18,7 +21,7 @@ import {
   getOmitSidesForDevice,
   canResizeFromSides,
 } from "./transformHandles";
-import { isImageElement, isLinearElement } from "./typeChecks";
+import { isImageElement, isLinearElement, isTextElement } from "./typeChecks";
 
 import type { Bounds } from "./bounds";
 import type {
@@ -96,9 +99,12 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
     if (!(isLinearElement(element) && element.points.length <= 2)) {
       const SPACING = isImageElement(element)
         ? 0
+        : isTextElement(element)
+        ? TEXT_SIDE_RESIZING_THRESHOLD / zoom.value
         : SIDE_RESIZING_THRESHOLD / zoom.value;
-      const ZOOMED_SIDE_RESIZING_THRESHOLD =
-        SIDE_RESIZING_THRESHOLD / zoom.value;
+      const ZOOMED_SIDE_RESIZING_THRESHOLD = isTextElement(element)
+        ? SIDE_RESIZING_THRESHOLD / zoom.value
+        : SIDE_RESIZING_THRESHOLD / zoom.value;
       const sides = getSelectionBorders(
         pointFrom(x1 - SPACING, y1 - SPACING),
         pointFrom(x2 + SPACING, y2 + SPACING),

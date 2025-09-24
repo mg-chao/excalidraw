@@ -12,6 +12,7 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   invariant,
+  TEXT_TRANSFORM_HANDLE_SPACING,
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
@@ -710,7 +711,7 @@ const renderTextBox = (
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
-  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+  const padding = (TEXT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
   const width = text.width + padding * 2;
   const height = text.height + padding * 2;
   const cx = text.x + width / 2;
@@ -976,6 +977,8 @@ const _renderInteractiveScene = ({
               element.id === appState.croppingElementId ||
               isImageElement(element)
                 ? 0
+                : isTextElement(element)
+                ? TEXT_TRANSFORM_HANDLE_SPACING * 2
                 : undefined,
           });
         }

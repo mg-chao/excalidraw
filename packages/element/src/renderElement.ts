@@ -50,7 +50,7 @@ import {
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
 } from "./textElement";
-import { getLineHeightInPx } from "./textMeasurements";
+import { getFontStrokeWidth, getLineHeightInPx } from "./textMeasurements";
 import {
   isTextElement,
   isLinearElement,
@@ -540,11 +540,12 @@ const drawElementOnCanvas = (
           const saveFillColor: string | CanvasGradient | CanvasPattern =
             context.fillStyle;
           context.fillStyle = element.textBackgroundColor;
+          const padding = 10;
           context.fillRect(
-            0,
-            -Math.ceil(element.height / 10 / 5),
-            element.width,
-            element.height,
+            0 - padding,
+            0 - padding,
+            element.width + padding * 2,
+            element.height + padding * 2,
           );
           context.fillStyle = saveFillColor;
         }
@@ -558,8 +559,11 @@ const drawElementOnCanvas = (
               context.strokeStyle;
             const saveLineWidth = context.lineWidth;
             context.strokeStyle = element.textStrokeColor;
-            context.lineWidth =
-              (lineHeightPx * ((element.textStrokeWidth ?? 0) / 100)) / 3;
+            context.lineWidth = getFontStrokeWidth(
+              element.fontSize,
+              element.lineHeight,
+              element.textStrokeWidth,
+            );
             const saveLineJoin = context.lineJoin;
             context.lineJoin = "round";
             context.strokeText(

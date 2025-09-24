@@ -2,6 +2,7 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   isAndroid,
   isIOS,
+  TEXT_TRANSFORM_HANDLE_SPACING,
 } from "@excalidraw/common";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
@@ -20,6 +21,7 @@ import {
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
+  isTextElement,
 } from "./typeChecks";
 
 import type { Bounds } from "./bounds";
@@ -314,7 +316,9 @@ export const getTransformHandles = (
     ? DEFAULT_TRANSFORM_HANDLE_SPACING + 8
     : isImageElement(element)
     ? 0
-    : DEFAULT_TRANSFORM_HANDLE_SPACING;
+    : isTextElement(element)
+    ? TEXT_TRANSFORM_HANDLE_SPACING
+    : undefined;
   return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element, elementsMap, true),
     element.angle,
@@ -322,7 +326,11 @@ export const getTransformHandles = (
     pointerType,
     omitSides,
     margin,
-    isImageElement(element) ? 0 : undefined,
+    isImageElement(element)
+      ? 0
+      : isTextElement(element)
+      ? TEXT_TRANSFORM_HANDLE_SPACING
+      : undefined,
   );
 };
 
