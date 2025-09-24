@@ -259,14 +259,17 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
+
+      const padding = 16;
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
-        left: `${viewportX}px`,
-        top: `${viewportY}px`,
+        left: `${viewportX - padding}px`,
+        top: `${viewportY - padding}px`,
+        padding: `${padding}px`,
         transform: getTransform(
           width,
           height,
