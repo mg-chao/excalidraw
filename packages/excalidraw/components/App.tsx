@@ -5290,8 +5290,11 @@ class App extends React.Component<AppProps, AppState> {
       // willing to test extensively. The hit testing starts to become unreliable
       // due to FP imprecision under 0.63 in high zoom levels.
       0.85 *
-        ((isTextElement(element) && !ignoreTextCollisionThreshold
-          ? TEXT_COLLISION_THRESHOLD
+        ((isTextElement(element)
+          ? ignoreTextCollisionThreshold ||
+            element.id.startsWith("snow-shot_serial-number")
+            ? 0
+            : TEXT_COLLISION_THRESHOLD
           : DEFAULT_COLLISION_THRESHOLD) /
           this.state.zoom.value),
     );
@@ -6939,7 +6942,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     } else if (this.state.activeTool.type === "text") {
       if (!isActiveSelectionTool) {
-        this.handleTextOnPointerDown(event, pointerDownState);
+        // this.handleTextOnPointerDown(event, pointerDownState);
       }
     } else if (
       this.state.activeTool.type === "arrow" ||
