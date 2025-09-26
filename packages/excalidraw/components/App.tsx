@@ -5395,6 +5395,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter = true,
     container,
     autoEdit = true,
+    ignoreSelectedTextElement = false,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -5404,6 +5405,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
+    ignoreSelectedTextElement?: boolean;
   }) => {
     let shouldBindToContainer = false;
 
@@ -5429,7 +5431,7 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length === 1) {
-      if (isTextElement(selectedElements[0])) {
+      if (isTextElement(selectedElements[0]) && !ignoreSelectedTextElement) {
         existingTextElement = selectedElements[0];
       } else if (container) {
         existingTextElement = getBoundTextElement(
@@ -6941,8 +6943,15 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.wasAddedToSelection = true;
       }
     } else if (this.state.activeTool.type === "text") {
-      if (!isActiveSelectionTool) {
-        // this.handleTextOnPointerDown(event, pointerDownState);
+      const hitSelectedElement =
+        pointerDownState.hit.element &&
+        this.isASelectedElement(pointerDownState.hit.element);
+
+      if (
+        !isActiveSelectionTool ||
+        (hitSelectedElement && pointerDownState.hit.element?.type === "text")
+      ) {
+        this.handleTextOnPointerDown(event, pointerDownState);
       }
     } else if (
       this.state.activeTool.type === "arrow" ||
@@ -7915,6 +7924,7 @@ class App extends React.Component<AppProps, AppState> {
       insertAtParentCenter: !event.altKey,
       container,
       autoEdit: false,
+      ignoreSelectedTextElement: true,
     });
 
     resetCursor(this.interactiveCanvas);
