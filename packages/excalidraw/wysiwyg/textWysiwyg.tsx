@@ -759,6 +759,9 @@ export const textWysiwyg = ({
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
+  editable.onmousedown = (event) => event.stopPropagation();
+  editable.onmouseup = (event) => event.stopPropagation();
+  editable.onmousemove = (event) => event.stopPropagation();
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg
