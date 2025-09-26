@@ -6942,14 +6942,23 @@ class App extends React.Component<AppProps, AppState> {
         });
         pointerDownState.hit.wasAddedToSelection = true;
       }
-    } else if (this.state.activeTool.type === "text") {
+    } else if (
+      this.state.activeTool.type === "text" ||
+      (pointerDownState.hit.element?.type === "text" &&
+        this.isASelectedElement(pointerDownState.hit.element))
+    ) {
+      const hitElement = this.getElementAtPosition(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        undefined,
+        true,
+      );
       const hitSelectedElement =
-        pointerDownState.hit.element &&
-        this.isASelectedElement(pointerDownState.hit.element);
+        hitElement && this.isASelectedElement(hitElement);
 
       if (
         !isActiveSelectionTool ||
-        (hitSelectedElement && pointerDownState.hit.element?.type === "text")
+        (hitSelectedElement && hitElement?.type === "text")
       ) {
         this.handleTextOnPointerDown(event, pointerDownState);
       }
