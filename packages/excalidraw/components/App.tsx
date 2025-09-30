@@ -1674,7 +1674,10 @@ class App extends React.Component<AppProps, AppState> {
                           {this.props.children}
                         </LayerUI>
 
-                        <div className="excalidraw-container-inner">
+                        <div
+                          className="excalidraw-container-inner"
+                          onWheel={this.props.customOptions?.onContainerWheel}
+                        >
                           <div className="excalidraw-textEditorContainer" />
                           <div className="excalidraw-contextMenuContainer" />
                           <div className="excalidraw-eye-dropper-container" />

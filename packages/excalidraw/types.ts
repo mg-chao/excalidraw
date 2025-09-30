@@ -555,6 +555,9 @@ export interface ExcalidrawPropsCustomOptions {
     event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     zoomAction: () => void,
   ) => void;
+  onContainerWheel?: (
+    event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
+  ) => void;
   hideMainToolbar?: boolean;
   hideMenu?: boolean;
   hideFooter?: boolean;
@@ -597,6 +600,7 @@ export interface ExcalidrawPropsCustomOptions {
     SerialNumberEditor?: React.ComponentType<{
       appState: UIAppState;
       targetElements: ExcalidrawElement[];
+      isSerialNumberTool: boolean;
     }>;
     ButtonList?: React.ComponentType<{
       children: React.ReactNode;
