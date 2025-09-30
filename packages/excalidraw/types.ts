@@ -600,6 +600,7 @@ export interface ExcalidrawPropsCustomOptions {
     SerialNumberEditor?: React.ComponentType<{
       appState: UIAppState;
       targetElements: ExcalidrawElement[];
+      isSerialNumberTool: boolean;
     }>;
     ButtonList?: React.ComponentType<{
       children: React.ReactNode;

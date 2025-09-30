@@ -260,13 +260,13 @@ export const SelectedShapeActions = ({
         />
       )}
 
-      {isSerialNumberTool &&
-        customOptions?.pickerRenders?.SerialNumberEditor && (
-          <customOptions.pickerRenders.SerialNumberEditor
-            appState={appState}
-            targetElements={targetElements}
-          />
-        )}
+      {customOptions?.pickerRenders?.SerialNumberEditor && (
+        <customOptions.pickerRenders.SerialNumberEditor
+          appState={appState}
+          targetElements={targetElements}
+          isSerialNumberTool={isSerialNumberTool}
+        />
+      )}
 
       {showFillIcons && renderAction("changeFillStyle")}
 
