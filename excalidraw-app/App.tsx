@@ -847,6 +847,10 @@ const ExcalidrawWrapper = () => {
           //   hideMenu: true,
           //   hideFooter: true,
           hideContextMenu: true,
+          //   getExtraTools: () => {
+          //     return ["serialNumber"];
+          //   },
+          canSelectType: () => true,
         }}
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
