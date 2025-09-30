@@ -37,6 +37,7 @@ import type {
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
+  PenMode,
 } from "@excalidraw/element/types";
 
 import type {
@@ -344,6 +345,7 @@ export interface AppState {
   currentItemRoughness: number;
   currentItemOpacity: number;
   currentItemBlur: number;
+  currentItemPenMode: PenMode;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;

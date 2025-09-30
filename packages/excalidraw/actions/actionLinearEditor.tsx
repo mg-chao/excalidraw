@@ -13,9 +13,9 @@ import {
 import { useContext } from "react";
 
 import type {
-    ExcalidrawLinearElement,
-    ExcalidrawLineElement,
-  } from "@excalidraw/element/types";
+  ExcalidrawLinearElement,
+  ExcalidrawLineElement,
+} from "@excalidraw/element/types";
 
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
 import { ToolButton } from "../components/ToolButton";
@@ -92,6 +92,8 @@ export const actionToggleLinearEditor = register({
       selectedElementIds: appState.selectedElementIds,
     })[0] as ExcalidrawLinearElement;
 
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
     if (!selectedElement) {
       return null;
     }
@@ -101,8 +103,6 @@ export const actionToggleLinearEditor = register({
         ? "labels.lineEditor.editArrow"
         : "labels.lineEditor.edit",
     );
-
-    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
 
     if (customOptions?.pickerRenders?.layerButtonRender) {
       return customOptions.pickerRenders.layerButtonRender({

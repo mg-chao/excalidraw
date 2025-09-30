@@ -8005,6 +8005,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
+      penMode: this.state.currentItemPenMode,
       roundness: null,
       simulatePressure,
       locked: false,

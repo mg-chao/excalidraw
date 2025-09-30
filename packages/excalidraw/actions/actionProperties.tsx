@@ -27,6 +27,7 @@ import {
   canBecomePolygon,
   getNonDeletedElements,
   hasTextStrokeColor,
+  isFreeDrawElement,
 } from "@excalidraw/element";
 
 import {
@@ -130,6 +131,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  BrushIcon,
+  HardPenIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -801,6 +804,64 @@ export const actionChangeStrokeWidth = register({
       </fieldset>
     );
   },
+});
+
+export const actionPenMode = register({
+  name: "changePenMode",
+  label: "labels.penMode",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isFreeDrawElement(el)) {
+          return newElementWith(el, {
+            penMode: value,
+          });
+        }
+        return el;
+      }),
+      appState: { ...appState, currentItemPenMode: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
+    <fieldset>
+      {appState.stylesPanelMode === "full" && (
+        <legend>{t("labels.penMode")}</legend>
+      )}
+      <div>
+        <RadioSelection
+          group="penMode"
+          options={[
+            {
+              value: "soft",
+              text: t("labels.penMode_soft"),
+              icon: BrushIcon,
+            },
+            {
+              value: "hard",
+              text: t("labels.penMode_hard"),
+              icon: HardPenIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            app,
+            (element) => {
+              if (isFreeDrawElement(element)) {
+                return element.penMode;
+              }
+              return "soft";
+            },
+            (element) => element.hasOwnProperty("penMode"),
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemPenMode,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
 });
 
 export const actionChangeSloppiness = register({
