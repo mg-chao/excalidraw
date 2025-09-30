@@ -6344,13 +6344,15 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (
+    const extraTools = this.props.customOptions?.getExtraTools?.();
+    if (extraTools?.includes("serialNumber")) {
+      if (!hitElement?.id.startsWith("snow-shot_serial-number")) {
+        return;
+      }
+    } else if (
       this.state.activeTool.type !== "selection" &&
-      hitElement?.type !== this.state.activeTool.type &&
-      !(
-        this.props.customOptions?.getExtraTools?.()?.includes("serialNumber") &&
-        hitElement?.id.startsWith("snow-shot_serial-number")
-      )
+      this.state.activeTool.type !== "lasso" &&
+      hitElement?.type !== this.state.activeTool.type
     ) {
       return;
     }
@@ -6835,11 +6837,22 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const isActiveSelectionTool =
-      pointerDownState.resize.isResizing ||
-      pointerDownState.hit.element?.type === this.state.activeTool.type ||
-      (this.props.customOptions?.getExtraTools?.()?.includes("serialNumber") &&
-        pointerDownState.hit.element?.id.startsWith("snow-shot_serial-number"));
+    let isActiveSelectionTool = false;
+
+    const extraTools = this.props.customOptions?.getExtraTools?.();
+    if (pointerDownState.resize.isResizing) {
+      isActiveSelectionTool = true;
+    } else if (extraTools?.includes("serialNumber")) {
+      if (
+        pointerDownState.hit.element?.id.startsWith("snow-shot_serial-number")
+      ) {
+        isActiveSelectionTool = true;
+      }
+    } else if (
+      pointerDownState.hit.element?.type === this.state.activeTool.type
+    ) {
+      isActiveSelectionTool = true;
+    }
 
     if (this.state.activeTool.type === "lasso") {
       const hitSelectedElement =
@@ -6969,7 +6982,9 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         !isActiveSelectionTool ||
-        (hitSelectedElement && hitElement?.type === "text")
+        (hitSelectedElement &&
+          hitElement?.type === "text" &&
+          !hitElement.id.startsWith("snow-shot_serial-number"))
       ) {
         this.handleTextOnPointerDown(event, pointerDownState);
       }
@@ -7555,14 +7570,11 @@ class App extends React.Component<AppProps, AppState> {
         // 如果是非选择模式，则过滤掉非当前工具的元素
         if (this.state.activeTool.type !== "selection") {
           allHitElements = allHitElements.filter((e) => {
-            if (e.type === this.state.activeTool.type) {
-              return true;
+            if (isSerialNumberTool) {
+              return e.id.startsWith("snow-shot_serial-number");
             }
 
-            if (
-              isSerialNumberTool &&
-              e.id.startsWith("snow-shot_serial-number")
-            ) {
+            if (e.type === this.state.activeTool.type) {
               return true;
             }
 
@@ -7609,17 +7621,20 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.origin.y,
             );
 
-          if (
-            this.state.activeTool.type !== "selection" &&
-            pointerDownState.hit.element?.type !== this.state.activeTool.type &&
-            !(
-              isSerialNumberTool &&
-              pointerDownState.hit.element?.id.startsWith(
-                "snow-shot_serial-number",
-              )
-            )
-          ) {
-            pointerDownState.hit.element = null;
+          if (this.state.activeTool.type !== "selection") {
+            if (isSerialNumberTool) {
+              if (
+                !pointerDownState.hit.element?.id.startsWith(
+                  "snow-shot_serial-number",
+                )
+              ) {
+                pointerDownState.hit.element = null;
+              }
+            } else if (
+              pointerDownState.hit.element?.type !== this.state.activeTool.type
+            ) {
+              pointerDownState.hit.element = null;
+            }
           }
         }
 
@@ -7660,22 +7675,23 @@ class App extends React.Component<AppProps, AppState> {
         const hitElement = pointerDownState.hit.element;
 
         // 如果是非选择模式，则过滤掉非当前工具的元素
-        if (
-          hitElement &&
-          this.state.activeTool.type !== "selection" &&
-          hitElement.type !== this.state.activeTool.type &&
-          !(
-            isSerialNumberTool &&
-            hitElement.id.startsWith("snow-shot_serial-number")
-          )
-        ) {
-          return false;
+        if (hitElement && this.state.activeTool.type !== "selection") {
+          if (isSerialNumberTool) {
+            if (!hitElement.id.startsWith("snow-shot_serial-number")) {
+              return false;
+            }
+          } else if (hitElement.type !== this.state.activeTool.type) {
+            return false;
+          }
         }
 
         const someHitElementIsSelected =
           pointerDownState.hit.allHitElements.some((element) => {
-            // 同类型元素在非选择模式下会被清除
-            if (element.type === this.state.activeTool.type) {
+            if (isSerialNumberTool) {
+              if (element.id.startsWith("snow-shot_serial-number")) {
+                return false;
+              }
+            } else if (element.type === this.state.activeTool.type) {
               return false;
             }
 
