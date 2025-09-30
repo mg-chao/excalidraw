@@ -27,6 +27,7 @@ export type StrokeRoundness = "round" | "sharp";
 export type RoundnessType = ValueOf<typeof ROUNDNESS>;
 export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
+export type PenMode = "hard" | "soft";
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
@@ -401,6 +402,7 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     pressures: readonly number[];
     simulatePressure: boolean;
     lastCommittedPoint: LocalPoint | null;
+    penMode: PenMode;
   }>;
 
 export type FileId = string & { _brand: "FileId" };

@@ -276,6 +276,10 @@ export const SelectedShapeActions = ({
 
       {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
+        renderAction("changePenMode")}
+
+      {(appState.activeTool.type === "freedraw" ||
+        targetElements.some((element) => element.type === "freedraw")) &&
         renderAction("changeStrokeShape")}
 
       {(hasStrokeStyle(appState.activeTool.type) ||

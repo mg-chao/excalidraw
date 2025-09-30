@@ -309,6 +309,7 @@ export const restoreElement = (
         lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
+        penMode: element.penMode || "soft",
       });
     }
     case "image":
