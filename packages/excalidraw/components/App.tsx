@@ -5898,7 +5898,10 @@ class App extends React.Component<AppProps, AppState> {
     return frames.length ? frames[frames.length - 1] : null;
   };
 
-  private canSelectType = (type: ToolType | "custom") => {
+  private canSelectType = (
+    type: ToolType | "custom",
+    extraTools?: string[],
+  ) => {
     if (this.props.customOptions?.canSelectType) {
       return this.props.customOptions.canSelectType(type);
     }
@@ -5912,7 +5915,8 @@ class App extends React.Component<AppProps, AppState> {
       type === "freedraw" ||
       type === "text" ||
       type === "blur" ||
-      type === "watermark"
+      type === "watermark" ||
+      extraTools?.includes("serialNumber")
     );
   };
 
@@ -6238,9 +6242,9 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser" &&
-        !(
-          this.canSelectType(this.state.activeTool.type) ||
-          this.props.customOptions?.getExtraTools?.()?.includes("serialNumber")
+        !this.canSelectType(
+          this.state.activeTool.type,
+          this.props.customOptions?.getExtraTools?.(),
         ))
     ) {
       return;
@@ -7409,9 +7413,9 @@ class App extends React.Component<AppProps, AppState> {
     if (
       this.state.activeTool.type !== "selection" &&
       this.state.activeTool.type !== "lasso" &&
-      !(
-        this.canSelectType(this.state.activeTool.type) ||
-        this.props.customOptions?.getExtraTools?.()?.includes("serialNumber")
+      !this.canSelectType(
+        this.state.activeTool.type,
+        this.props.customOptions?.getExtraTools?.(),
       )
     ) {
       this.setState({
@@ -7433,8 +7437,10 @@ class App extends React.Component<AppProps, AppState> {
     if (
       this.state.activeTool.type === "selection" ||
       this.state.activeTool.type === "lasso" ||
-      this.canSelectType(this.state.activeTool.type) ||
-      this.props.customOptions?.getExtraTools?.()?.includes("serialNumber")
+      this.canSelectType(
+        this.state.activeTool.type,
+        this.props.customOptions?.getExtraTools?.(),
+      )
     ) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();

@@ -571,7 +571,7 @@ export interface ExcalidrawPropsCustomOptions {
   shouldRotateWithDiscreteAngle?: (
     event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
   ) => boolean;
-  canSelectType?: (type: ToolType | "custom") => boolean;
+  canSelectType?: (type: ToolType | "custom", extraTools?: string[]) => boolean;
   shouldSnapping?: (event: KeyboardModifiersObject) => boolean;
   getReferenceSnapPoints?: (
     defaultFn: typeof getReferenceSnapPoints,
