@@ -5899,6 +5899,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private canSelectType = (type: ToolType | "custom") => {
+    if (this.props.customOptions?.canSelectType) {
+      return this.props.customOptions.canSelectType(type);
+    }
+
     return (
       type === "rectangle" ||
       type === "diamond" ||
