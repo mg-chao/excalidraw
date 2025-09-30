@@ -555,6 +555,9 @@ export interface ExcalidrawPropsCustomOptions {
     event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     zoomAction: () => void,
   ) => void;
+  onContainerWheel?: (
+    event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
+  ) => void;
   hideMainToolbar?: boolean;
   hideMenu?: boolean;
   hideFooter?: boolean;
