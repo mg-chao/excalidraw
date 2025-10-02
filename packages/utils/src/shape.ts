@@ -40,6 +40,7 @@ import type {
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawBlurElement,
+  ExcalidrawBlurFreeDrawElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
@@ -267,7 +268,7 @@ const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
 };
 
 export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
-  element: ExcalidrawFreeDrawElement,
+  element: ExcalidrawFreeDrawElement | ExcalidrawBlurFreeDrawElement,
   center: Point,
   isClosed: boolean = false,
 ): GeometricShape<Point> => {

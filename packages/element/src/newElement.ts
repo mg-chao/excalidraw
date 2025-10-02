@@ -50,6 +50,7 @@ import type {
   ExcalidrawBlurElement,
   ExcalidrawLineElement,
   ExcalidrawWatermarkElement,
+  ExcalidrawBlurFreeDrawElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -507,6 +508,27 @@ export const newFreeDrawElement = (
     simulatePressure: opts.simulatePressure,
     lastCommittedPoint: null,
     penMode: opts.penMode || "soft",
+  };
+};
+
+export const newBlurFreeDrawElement = (
+  opts: {
+    type: "blur_freedraw";
+    points?: ExcalidrawFreeDrawElement["points"];
+    simulatePressure: boolean;
+    pressures?: ExcalidrawFreeDrawElement["pressures"];
+    penMode?: ExcalidrawFreeDrawElement["penMode"];
+    blur: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawBlurFreeDrawElement> => {
+  return {
+    ..._newElementBase<ExcalidrawBlurFreeDrawElement>(opts.type, opts),
+    points: opts.points || [],
+    pressures: [],
+    simulatePressure: false,
+    lastCommittedPoint: null,
+    penMode: "hard",
+    blur: opts.blur,
   };
 };
 

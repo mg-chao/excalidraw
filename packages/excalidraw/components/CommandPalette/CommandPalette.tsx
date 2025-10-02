@@ -491,7 +491,8 @@ function CommandPaletteInner({
           }
 
           const letter =
-            key && capitalizeString(typeof key === "string" ? key : key[0]);
+            key &&
+            capitalizeString(typeof key === "string" ? key : key[0] ?? "");
           const shortcut = letter || numericKey;
 
           const command: CommandPaletteItem = {

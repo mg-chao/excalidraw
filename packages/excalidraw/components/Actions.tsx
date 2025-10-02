@@ -120,6 +120,7 @@ export const canChangeStrokeColor = (
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
       commonSelectedType !== "blur" &&
+      commonSelectedType !== "blur_freedraw" &&
       commonSelectedType !== "watermark" &&
       commonSelectedType !== "magicframe") ||
     targetElements.some((element) => hasStrokeColor(element.type))
@@ -931,7 +932,8 @@ export const ShapesSwitcher = ({
 
           const label = t(`toolBar.${value}`);
           const letter =
-            key && capitalizeString(typeof key === "string" ? key : key[0]);
+            key &&
+            capitalizeString(typeof key === "string" ? key : key[0] ?? "");
           const shortcut = letter
             ? `${letter} ${t("helpDialog.or")} ${numericKey}`
             : `${numericKey}`;

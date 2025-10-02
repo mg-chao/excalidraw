@@ -9,6 +9,7 @@ import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/comm
 import {
   newArrowElement,
   newBlurElement,
+  newBlurFreeDrawElement,
   newElement,
   newEmbeddableElement,
   newFrameElement,
@@ -313,11 +314,20 @@ export class API {
         element.width = width;
         element.height = height;
         break;
-      case "freedraw":
-        element = newFreeDrawElement({
-          type: type as "freedraw",
-          simulatePressure: true,
+    case "freedraw":
+            element = newFreeDrawElement({
+            type: type as "freedraw",
+            simulatePressure: true,
+            points: rest.points,
+            ...base,
+            });
+            break;
+      case "blur_freedraw":
+        element = newBlurFreeDrawElement({
+          type: type as "blur_freedraw",
+          simulatePressure: false,
           points: rest.points,
+          blur: appState.currentItemBlur,
           ...base,
         });
         break;

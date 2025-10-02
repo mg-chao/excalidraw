@@ -223,6 +223,7 @@ export type ExcalidrawElement =
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
+  | ExcalidrawBlurFreeDrawElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
@@ -403,6 +404,17 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     simulatePressure: boolean;
     lastCommittedPoint: LocalPoint | null;
     penMode: PenMode;
+  }>;
+
+export type ExcalidrawBlurFreeDrawElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "blur_freedraw";
+    points: readonly LocalPoint[];
+    lastCommittedPoint: LocalPoint | null;
+    pressures: readonly number[];
+    simulatePressure: boolean;
+    penMode: PenMode;
+    blur: number;
   }>;
 
 export type FileId = string & { _brand: "FileId" };

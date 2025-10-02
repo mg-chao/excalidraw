@@ -62,7 +62,7 @@ const getHints = ({
     return t("hints.linearElement");
   }
 
-  if (activeTool.type === "freedraw") {
+  if (activeTool.type === "freedraw" || activeTool.type === "blur_freedraw") {
     return t("hints.freeDraw");
   }
 

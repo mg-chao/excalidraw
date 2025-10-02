@@ -160,6 +160,7 @@ export const actionFinalize = register({
       element = appState.multiElement;
     } else if (
       appState.newElement?.type === "freedraw" ||
+      appState.newElement?.type === "blur_freedraw" ||
       isBindingElement(appState.newElement)
     ) {
       element = appState.newElement;
@@ -174,7 +175,11 @@ export const actionFinalize = register({
 
     if (element) {
       // pen and mouse have hover
-      if (appState.multiElement && element.type !== "freedraw") {
+      if (
+        appState.multiElement &&
+        element.type !== "freedraw" &&
+        element.type !== "blur_freedraw"
+      ) {
         const { points, lastCommittedPoint } = element;
         if (
           !lastCommittedPoint ||
@@ -251,7 +256,8 @@ export const actionFinalize = register({
 
     if (
       (!appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw") ||
+        appState.activeTool.type !== "freedraw" &&
+        appState.activeTool.type !== "blur_freedraw") ||
       !element
     ) {
       resetCursor(interactiveCanvas);
@@ -278,7 +284,8 @@ export const actionFinalize = register({
         cursorButton: "up",
         activeTool:
           (appState.activeTool.locked ||
-            appState.activeTool.type === "freedraw") &&
+            appState.activeTool.type === "freedraw" ||
+            appState.activeTool.type === "blur_freedraw") &&
           element
             ? appState.activeTool
             : activeTool,
@@ -292,7 +299,8 @@ export const actionFinalize = register({
         selectedElementIds:
           element &&
           !appState.activeTool.locked &&
-          appState.activeTool.type !== "freedraw"
+          appState.activeTool.type !== "freedraw" &&
+          appState.activeTool.type !== "blur_freedraw"
             ? {
                 ...appState.selectedElementIds,
                 [element.id]: true,

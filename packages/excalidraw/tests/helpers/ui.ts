@@ -431,7 +431,10 @@ type DrawingToolName = Exclude<
   "lock" | "selection" | "eraser" | "lasso"
 >;
 
-type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
+type Element<T extends DrawingToolName> = T extends
+  | "line"
+  | "freedraw"
+  | "blur_freedraw"
   ? ExcalidrawLinearElement
   : T extends "arrow"
   ? ExcalidrawArrowElement
@@ -499,7 +502,9 @@ export class UI {
       width?: number;
       height?: number;
       angle?: number;
-      points?: T extends "line" | "arrow" | "freedraw" ? LocalPoint[] : never;
+      points?: T extends "line" | "arrow" | "freedraw" | "blur_freedraw"
+        ? LocalPoint[]
+        : never;
     } = {},
   ): Element<T> & {
     /** Returns the actual, current element from the elements array, instead
@@ -524,7 +529,10 @@ export class UI {
         mouse.click(x + point[0], y + point[1]);
       });
       Keyboard.keyPress(KEYS.ESCAPE);
-    } else if (type === "freedraw" && points.length > 2) {
+    } else if (
+      type === "freedraw" ||
+      (type === "blur_freedraw" && points.length > 2)
+    ) {
       const firstPoint = points[0];
       mouse.reset();
       mouse.down(x + firstPoint[0], y + firstPoint[1]);

@@ -157,6 +157,7 @@ export type ToolType =
   | "arrow"
   | "line"
   | "freedraw"
+  | "blur_freedraw"
   | "text"
   | "image"
   | "eraser"

@@ -76,6 +76,7 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
+  ExcalidrawBlurFreeDrawElement,
 } from "./types";
 
 import type { StrokeOptions } from "perfect-freehand";
@@ -111,6 +112,7 @@ const shouldResetImageFilter = (
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
+    case "blur_freedraw":
       return element.strokeWidth * 12;
     case "text":
       return element.fontSize / 2;
@@ -428,6 +430,7 @@ const drawElementOnCanvas = (
     // 渲染
     // Blur 和 Watermark 都放到 Snow Shot 上渲染
     case "blur":
+    case "blur_freedraw":
     case "watermark":
       break;
     case "arrow":
@@ -833,6 +836,7 @@ export const renderElement = (
       }
       break;
     }
+    case "blur_freedraw":
     case "freedraw": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
@@ -1081,20 +1085,29 @@ export const renderElement = (
   context.globalAlpha = 1;
 };
 
-export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
+export const pathsCache = new WeakMap<
+  ExcalidrawFreeDrawElement | ExcalidrawBlurFreeDrawElement,
+  Path2D
+>([]);
 
-export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
+export function generateFreeDrawShape(
+  element: ExcalidrawFreeDrawElement | ExcalidrawBlurFreeDrawElement,
+) {
   const svgPathData = getFreeDrawSvgPath(element);
   const path = new Path2D(svgPathData);
   pathsCache.set(element, path);
   return path;
 }
 
-export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
+export function getFreeDrawPath2D(
+  element: ExcalidrawFreeDrawElement | ExcalidrawBlurFreeDrawElement,
+) {
   return pathsCache.get(element);
 }
 
-export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+export function getFreeDrawSvgPath(
+  element: ExcalidrawFreeDrawElement | ExcalidrawBlurFreeDrawElement,
+) {
   return getSvgPathFromStroke(getFreedrawOutlinePoints(element));
 }
 
@@ -1154,7 +1167,9 @@ export function getFreedrawOutlineAsSegments(
   );
 }
 
-export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
+export function getFreedrawOutlinePoints(
+  element: ExcalidrawFreeDrawElement | ExcalidrawBlurFreeDrawElement,
+) {
   // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure
     ? element.points

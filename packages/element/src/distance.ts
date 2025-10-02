@@ -18,6 +18,7 @@ import { elementCenterPoint } from "./bounds";
 
 import type {
   ElementsMap,
+  ExcalidrawBlurFreeDrawElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
@@ -50,6 +51,7 @@ export const distanceToElement = (
     case "line":
     case "arrow":
     case "freedraw":
+    case "blur_freedraw":
       return distanceToLinearOrFreeDraElement(element, p);
   }
 };
@@ -134,7 +136,10 @@ const distanceToEllipseElement = (
 };
 
 const distanceToLinearOrFreeDraElement = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawBlurFreeDrawElement,
   p: GlobalPoint,
 ) => {
   const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
