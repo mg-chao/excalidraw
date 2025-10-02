@@ -220,6 +220,7 @@ export const newMagicFrameElement = (
 export const newBlurElement = (
   opts: {
     blur: number;
+    filterType: string;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawBlurElement> => {
   const blurElement = newElementWith(
@@ -227,6 +228,7 @@ export const newBlurElement = (
       ..._newElementBase<ExcalidrawBlurElement>("blur", opts),
       type: "blur",
       blur: opts.blur,
+      filterType: opts.filterType,
       fillStyle: "solid",
       backgroundColor: "#000000",
     },
@@ -519,6 +521,7 @@ export const newBlurFreeDrawElement = (
     pressures?: ExcalidrawFreeDrawElement["pressures"];
     penMode?: ExcalidrawFreeDrawElement["penMode"];
     blur: number;
+    filterType: string;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawBlurFreeDrawElement> => {
   return {
@@ -529,6 +532,7 @@ export const newBlurFreeDrawElement = (
     lastCommittedPoint: null,
     penMode: "hard",
     blur: opts.blur,
+    filterType: opts.filterType,
   };
 };
 

@@ -134,6 +134,7 @@
     "bindText": "Bind text to the container",
     "createContainerFromText": "Wrap text in a container",
     "blur": "Strength",
+    "blurFilterType": "Filter type",
     "link": {
       "edit": "Edit link",
       "editEmbed": "Edit embeddable link",

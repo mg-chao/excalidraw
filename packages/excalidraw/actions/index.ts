@@ -22,6 +22,7 @@ export {
 } from "./actionProperties";
 
 export { actionChangeBlur } from "./actionBlur";
+export { actionChangeBlurFilterType } from "./actionBlur";
 
 export {
   actionChangeViewBackgroundColor,

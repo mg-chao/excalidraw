@@ -128,6 +128,7 @@
     "bindText": "将文本绑定到容器",
     "createContainerFromText": "将文本包围在容器中",
     "blur": "强度",
+    "blurFilterType": "滤镜",
     "link": {
       "edit": "编辑链接",
       "editEmbed": "编辑链接与嵌入",

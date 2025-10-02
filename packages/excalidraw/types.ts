@@ -346,6 +346,7 @@ export interface AppState {
   currentItemRoughness: number;
   currentItemOpacity: number;
   currentItemBlur: number;
+  currentItemFilterType: string;
   currentItemPenMode: PenMode;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
@@ -613,6 +614,7 @@ export interface ExcalidrawPropsCustomOptions {
     elementStrokeColors?: ColorTuple;
     elementBackgroundColors?: ColorTuple;
     RadioSelection?: typeof RadioSelection;
+    FilterTypeRadioSelection?: typeof RadioSelection;
     buttonIconSelectRadioRender?: (props: {
       key: string;
       active: boolean;
