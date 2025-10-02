@@ -8048,6 +8048,7 @@ class App extends React.Component<AppProps, AppState> {
             points: [pointFrom<LocalPoint>(0, 0)],
             pressures: simulatePressure ? [] : [event.pressure],
             blur: this.state.currentItemBlur,
+            filterType: this.state.currentItemFilterType,
           });
 
     this.scene.insertElement(element);
@@ -8453,6 +8454,7 @@ class App extends React.Component<AppProps, AppState> {
       element = newBlurElement({
         ...baseElementAttributes,
         blur: this.state.currentItemBlur,
+        filterType: this.state.currentItemFilterType,
       });
     } else if (elementType === "watermark") {
       element = newWatermarkElement({

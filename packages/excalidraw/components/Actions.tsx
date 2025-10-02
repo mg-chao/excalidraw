@@ -275,6 +275,10 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => element.type === "freedraw")) &&
         renderAction("changePenMode")}
 
+      {(canChangeBlur(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeBlur(element.type))) &&
+        renderAction("changeBlurFilterType")}
+
       {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}

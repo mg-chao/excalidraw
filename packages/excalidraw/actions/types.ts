@@ -148,6 +148,7 @@ export type ActionName =
   | "wrapSelectionInFrame"
   | "toggleLassoTool"
   | "changeBlur"
+  | "changeBlurFilterType"
   | "toggleShapeSwitch"
   | "togglePolygon";
 

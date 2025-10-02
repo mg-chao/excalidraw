@@ -93,6 +93,7 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
 export type ExcalidrawBlurElement = _ExcalidrawElementBase & {
   type: "blur";
   blur: number;
+  filterType: string;
 };
 
 export type ExcalidrawWatermarkElement = _ExcalidrawElementBase & {
@@ -415,6 +416,7 @@ export type ExcalidrawBlurFreeDrawElement = _ExcalidrawElementBase &
     simulatePressure: boolean;
     penMode: PenMode;
     blur: number;
+    filterType: string;
   }>;
 
 export type FileId = string & { _brand: "FileId" };
