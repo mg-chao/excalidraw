@@ -290,7 +290,11 @@ export const getTransformHandles = (
     return {};
   }
 
-  if (element.type === "freedraw" || isLinearElement(element)) {
+  if (
+    element.type === "freedraw" ||
+    element.type === "blur_freedraw" ||
+    isLinearElement(element)
+  ) {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
       const [, p1] = element.points;

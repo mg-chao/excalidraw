@@ -44,6 +44,7 @@ import type { ElementConstructorOpts } from "@excalidraw/element";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
+  ExcalidrawBlurFreeDrawElement,
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
@@ -176,7 +177,9 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      ExcalidrawIframeLikeElement | ExcalidrawFreeDrawElement
+      | ExcalidrawIframeLikeElement
+      | ExcalidrawFreeDrawElement
+      | ExcalidrawBlurFreeDrawElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -622,6 +625,7 @@ export const convertToExcalidrawElements = (
         break;
       }
       case "freedraw":
+      case "blur_freedraw":
       case "iframe":
       case "embeddable": {
         excalidrawElement = element;

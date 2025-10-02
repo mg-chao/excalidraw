@@ -58,6 +58,7 @@ import { distanceToElement } from "./distance";
 
 import type {
   ElementsMap,
+  ExcalidrawBlurFreeDrawElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
@@ -81,7 +82,7 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
-  if (element.type === "freedraw") {
+  if (element.type === "freedraw" || element.type === "blur_freedraw") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
@@ -258,6 +259,7 @@ export const intersectElementWithLineSegment = (
       );
     case "line":
     case "freedraw":
+    case "blur_freedraw":
     case "arrow":
       return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
   }
@@ -324,7 +326,10 @@ const lineIntersections = (
 };
 
 const intersectLinearOrFreeDrawWithLineSegment = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawBlurFreeDrawElement,
   segment: LineSegment<GlobalPoint>,
   onlyFirst = false,
 ): GlobalPoint[] => {

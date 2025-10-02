@@ -103,7 +103,7 @@ export const isFreeDrawElement = (
 export const isFreeDrawElementType = (
   elementType: ExcalidrawElementType,
 ): boolean => {
-  return elementType === "freedraw";
+  return elementType === "freedraw" || elementType === "blur_freedraw";
 };
 
 export const isLinearElement = (
@@ -168,7 +168,7 @@ export const isLinearElementType = (
 };
 
 export const isBlurElementType = (elementType: ElementOrToolType): boolean => {
-  return elementType === "blur";
+  return elementType === "blur" || elementType === "blur_freedraw";
 };
 
 export const isWatermarkElementType = (
@@ -243,7 +243,8 @@ export const isRectangularElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
-      element.type === "freedraw")
+      element.type === "freedraw" ||
+      element.type === "blur_freedraw")
   );
 };
 
@@ -277,6 +278,7 @@ export const isExcalidrawElement = (
     case "ellipse":
     case "arrow":
     case "freedraw":
+    case "blur_freedraw":
     case "line":
     case "frame":
     case "magicframe":

@@ -66,6 +66,13 @@ export const SHAPES = [
     fillable: false,
   },
   {
+    icon: FreedrawIcon,
+    value: "blur_freedraw",
+    key: [],
+    numericKey: "",
+    fillable: false,
+  },
+  {
     icon: TextIcon,
     value: "text",
     key: KEYS.T,
@@ -81,7 +88,7 @@ export const SHAPES = [
   },
   {
     icon: RectangleIcon,
-    key: null,
+    key: [],
     value: "blur",
     numericKey: "",
     fillable: false,
@@ -89,7 +96,7 @@ export const SHAPES = [
   {
     icon: RectangleIcon,
     value: "watermark",
-    key: null,
+    key: [],
     numericKey: "",
     fillable: false,
   },

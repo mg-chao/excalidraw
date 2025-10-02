@@ -97,6 +97,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  blur_freedraw: true,
   eraser: false,
   custom: true,
   frame: true,
@@ -303,7 +304,8 @@ export const restoreElement = (
       }
 
       return element;
-    case "freedraw": {
+    case "freedraw":
+    case "blur_freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
         lastCommittedPoint: null,

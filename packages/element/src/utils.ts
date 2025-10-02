@@ -26,6 +26,7 @@ import { getDiamondPoints } from "./bounds";
 import { generateLinearCollisionShape } from "./shape";
 
 import type {
+  ExcalidrawBlurFreeDrawElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -97,7 +98,10 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
  * @returns The rotated in components.
  */
 export function deconstructLinearOrFreeDrawElement(
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawBlurFreeDrawElement,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 

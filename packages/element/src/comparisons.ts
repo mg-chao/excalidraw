@@ -13,7 +13,8 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type !== "image" &&
   type !== "frame" &&
   type !== "magicframe" &&
-  type !== "blur";
+  type !== "blur" &&
+  type !== "blur_freedraw";
 
 export const hasTextStrokeColor = (type: ElementOrToolType) => type === "text";
 
@@ -24,6 +25,7 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "freedraw" ||
+  type === "blur_freedraw" ||
   type === "arrow" ||
   type === "line";
 
@@ -44,10 +46,11 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "image";
 
-export const canChangeBlur = (type: ElementOrToolType) => type === "blur";
+export const canChangeBlur = (type: ElementOrToolType) =>
+  type === "blur" || type === "blur_freedraw";
 
 export const canChangeLayer = (type: ElementOrToolType) =>
-  type !== "blur" && type !== "watermark";
+  type !== "blur" && type !== "blur_freedraw" && type !== "watermark";
 
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
 

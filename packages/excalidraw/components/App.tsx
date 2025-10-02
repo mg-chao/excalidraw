@@ -245,6 +245,7 @@ import {
   type ApplyToOptions,
   positionElementsOnGrid,
   newWatermarkElement,
+  newBlurFreeDrawElement,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -272,6 +273,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
+  ExcalidrawBlurFreeDrawElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -4883,7 +4885,10 @@ class App extends React.Component<AppProps, AppState> {
         activeEmbeddable: null,
       } as const;
 
-      if (nextActiveTool.type === "freedraw") {
+      if (
+        nextActiveTool.type === "freedraw" ||
+        nextActiveTool.type === "blur_freedraw"
+      ) {
         this.store.scheduleCapture();
       }
 
@@ -5913,6 +5918,7 @@ class App extends React.Component<AppProps, AppState> {
       type === "arrow" ||
       type === "line" ||
       type === "freedraw" ||
+      type === "blur_freedraw" ||
       type === "text" ||
       type === "blur" ||
       type === "watermark" ||
@@ -5947,7 +5953,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor =
-        this.state.activeTool.type === "freedraw" && this.state.penMode
+        (this.state.activeTool.type === "freedraw" ||
+          this.state.activeTool.type === "blur_freedraw") &&
+        this.state.penMode
           ? 1
           : distance / gesture.initialDistance;
 
@@ -6663,7 +6671,8 @@ class App extends React.Component<AppProps, AppState> {
     if (
       event.pointerType === "touch" &&
       this.state.newElement &&
-      this.state.newElement.type === "freedraw"
+      (this.state.newElement.type === "freedraw" ||
+        this.state.newElement.type === "blur_freedraw")
     ) {
       const element = this.state.newElement as ExcalidrawFreeDrawElement;
       this.updateScene({
@@ -6999,7 +7008,10 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState,
         );
       }
-    } else if (this.state.activeTool.type === "freedraw") {
+    } else if (
+      this.state.activeTool.type === "freedraw" ||
+      this.state.activeTool.type === "blur_freedraw"
+    ) {
       if (!isActiveSelectionTool) {
         this.handleFreeDrawElementOnPointerDown(
           event,
@@ -7977,7 +7989,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleFreeDrawElementOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,
-    elementType: ExcalidrawFreeDrawElement["type"],
+    elementType:
+      | ExcalidrawFreeDrawElement["type"]
+      | ExcalidrawBlurFreeDrawElement["type"],
     pointerDownState: PointerDownState,
   ) => {
     // Begin a mark capture. This does not have to update state yet.
@@ -7994,25 +8008,47 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5;
 
-    const element = newFreeDrawElement({
-      type: elementType,
-      x: gridX,
-      y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
-      fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
-      strokeStyle: this.state.currentItemStrokeStyle,
-      roughness: this.state.currentItemRoughness,
-      opacity: this.state.currentItemOpacity,
-      penMode: this.state.currentItemPenMode,
-      roundness: null,
-      simulatePressure,
-      locked: false,
-      frameId: topLayerFrame ? topLayerFrame.id : null,
-      points: [pointFrom<LocalPoint>(0, 0)],
-      pressures: simulatePressure ? [] : [event.pressure],
-    });
+    const element =
+      elementType === "freedraw"
+        ? newFreeDrawElement({
+            type: elementType,
+            x: gridX,
+            y: gridY,
+            strokeColor: this.state.currentItemStrokeColor,
+            backgroundColor: this.state.currentItemBackgroundColor,
+            fillStyle: this.state.currentItemFillStyle,
+            strokeWidth: this.state.currentItemStrokeWidth,
+            strokeStyle: this.state.currentItemStrokeStyle,
+            roughness: this.state.currentItemRoughness,
+            opacity: this.state.currentItemOpacity,
+            penMode: this.state.currentItemPenMode,
+            roundness: null,
+            simulatePressure,
+            locked: false,
+            frameId: topLayerFrame ? topLayerFrame.id : null,
+            points: [pointFrom<LocalPoint>(0, 0)],
+            pressures: simulatePressure ? [] : [event.pressure],
+          })
+        : newBlurFreeDrawElement({
+            type: elementType,
+            x: gridX,
+            y: gridY,
+            strokeColor: this.state.currentItemStrokeColor,
+            backgroundColor: this.state.currentItemBackgroundColor,
+            fillStyle: this.state.currentItemFillStyle,
+            strokeWidth: this.state.currentItemStrokeWidth,
+            strokeStyle: this.state.currentItemStrokeStyle,
+            roughness: this.state.currentItemRoughness,
+            opacity: this.state.currentItemOpacity,
+            penMode: this.state.currentItemPenMode,
+            roundness: null,
+            simulatePressure,
+            locked: false,
+            frameId: topLayerFrame ? topLayerFrame.id : null,
+            points: [pointFrom<LocalPoint>(0, 0)],
+            pressures: simulatePressure ? [] : [event.pressure],
+            blur: this.state.currentItemBlur,
+          });
 
     this.scene.insertElement(element);
 
@@ -9239,7 +9275,10 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        if (newElement.type === "freedraw") {
+        if (
+          newElement.type === "freedraw" ||
+          newElement.type === "blur_freedraw"
+        ) {
           const points = newElement.points;
           const dx = pointerCoords.x - newElement.x;
           const dy = pointerCoords.y - newElement.y;
@@ -9665,7 +9704,10 @@ class App extends React.Component<AppProps, AppState> {
         childEvent,
       );
 
-      if (newElement?.type === "freedraw") {
+      if (
+        newElement?.type === "freedraw" ||
+        newElement?.type === "blur_freedraw"
+      ) {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
@@ -10337,7 +10379,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!activeTool.locked && activeTool.type !== "freedraw" && newElement) {
+      if (
+        !activeTool.locked &&
+        activeTool.type !== "freedraw" &&
+        activeTool.type !== "blur_freedraw" &&
+        newElement
+      ) {
         this.setState((prevState) => ({
           selectedElementIds: makeNextSelectedElementIds(
             {
@@ -10394,6 +10441,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !activeTool.locked &&
         activeTool.type !== "freedraw" &&
+        activeTool.type !== "blur_freedraw" &&
         (activeTool.type !== "lasso" ||
           // if lasso is turned on but from selection => reset to selection
           (activeTool.type === "lasso" && activeTool.fromSelection))
