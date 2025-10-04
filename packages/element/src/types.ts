@@ -96,6 +96,14 @@ export type ExcalidrawBlurElement = _ExcalidrawElementBase & {
   filterType: string;
 };
 
+export type ExcalidrawHighlightElement = _ExcalidrawElementBase & {
+  type: "highlight";
+  shapeType: "circle" | "rect";
+  borderType: "none" | "solid" | "dashed" | "dotted";
+  maskColor: string;
+  maskOpacity: number;
+};
+
 export type ExcalidrawWatermarkElement = _ExcalidrawElementBase & {
   type: "watermark";
   watermarkText: string;
@@ -208,6 +216,7 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawBlurElement
+  | ExcalidrawHighlightElement
   | ExcalidrawWatermarkElement
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
@@ -231,6 +240,7 @@ export type ExcalidrawElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawBlurElement
+  | ExcalidrawHighlightElement
   | ExcalidrawWatermarkElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<

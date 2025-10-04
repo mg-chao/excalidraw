@@ -51,6 +51,7 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawWatermarkElement,
   ExcalidrawBlurFreeDrawElement,
+  ExcalidrawHighlightElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -236,6 +237,29 @@ export const newBlurElement = (
   );
 
   return blurElement;
+};
+
+export const newHighlightElement = (
+  opts: {
+    maskColor: string;
+    maskOpacity: number;
+    shapeType: "circle" | "rect";
+    borderType: "none" | "solid" | "dashed" | "dotted";
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawHighlightElement> => {
+  const highlightElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawHighlightElement>("highlight", opts),
+      type: "highlight",
+      maskColor: opts.maskColor,
+      maskOpacity: opts.maskOpacity,
+      shapeType: opts.shapeType,
+      borderType: opts.borderType,
+    },
+    {},
+  );
+
+  return highlightElement;
 };
 
 export const newWatermarkElement = (

@@ -167,6 +167,7 @@ export type ToolType =
   | "embeddable"
   | "laser"
   | "blur"
+  | "highlight"
   | "watermark";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
@@ -347,6 +348,10 @@ export interface AppState {
   currentItemOpacity: number;
   currentItemBlur: number;
   currentItemFilterType: string;
+  currentItemMaskColor: string;
+  currentItemMaskOpacity: number;
+  currentItemShapeType: "circle" | "rect";
+  currentItemBorderType: "none" | "solid" | "dashed" | "dotted";
   currentItemPenMode: PenMode;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
@@ -615,6 +620,8 @@ export interface ExcalidrawPropsCustomOptions {
     elementBackgroundColors?: ColorTuple;
     RadioSelection?: typeof RadioSelection;
     FilterTypeRadioSelection?: typeof RadioSelection;
+    ShapeTypeRadioSelection?: typeof RadioSelection;
+    BorderTypeRadioSelection?: typeof RadioSelection;
     buttonIconSelectRadioRender?: (props: {
       key: string;
       active: boolean;

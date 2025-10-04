@@ -97,6 +97,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  highlight: true,
   blur_freedraw: true,
   eraser: false,
   custom: true,
@@ -408,6 +409,7 @@ export const restoreElement = (
     // generic elements
     case "ellipse":
     case "blur":
+    case "highlight":
     case "watermark":
     case "rectangle":
     case "diamond":

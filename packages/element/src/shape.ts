@@ -216,6 +216,7 @@ export const generateRoughOptions = (
     case "embeddable":
     case "diamond":
     case "blur":
+    case "highlight":
     case "watermark":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
@@ -627,6 +628,7 @@ const generateElementShape = (
     case "rectangle":
     case "iframe":
     case "blur":
+    case "highlight":
     case "watermark":
     case "embeddable": {
       let shape: ElementShapes[typeof element.type];
@@ -933,6 +935,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "iframe":
     case "blur":
     case "watermark":
+    case "highlight":
     case "text":
     case "selection":
       return getPolygonShape(element);

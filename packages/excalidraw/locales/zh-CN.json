@@ -32,6 +32,7 @@
     "penMode_soft": "软笔",
     "strokeStyle": "边框样式",
     "strokeStyle_solid": "实线",
+    "strokeStyle_none": "无",
     "strokeStyle_dashed": "虚线",
     "strokeStyle_dotted": "点虚线",
     "sloppiness": "线条风格",
@@ -129,6 +130,10 @@
     "createContainerFromText": "将文本包围在容器中",
     "blur": "强度",
     "blurFilterType": "滤镜",
+    "highlightShapeType": "形状",
+    "highlightBorderType": "边框",
+    "highlightMaskColor": "遮罩颜色",
+    "highlightMaskOpacity": "遮罩透明度",
     "link": {
       "edit": "编辑链接",
       "editEmbed": "编辑链接与嵌入",

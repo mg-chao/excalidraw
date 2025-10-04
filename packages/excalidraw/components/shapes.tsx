@@ -101,6 +101,13 @@ export const SHAPES = [
     fillable: false,
   },
   {
+    icon: RectangleIcon,
+    key: [],
+    value: "highlight",
+    numericKey: "",
+    fillable: false,
+  },
+  {
     icon: EraserIcon,
     value: "eraser",
     key: KEYS.E,
