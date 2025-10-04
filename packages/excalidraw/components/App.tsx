@@ -248,6 +248,7 @@ import {
   positionElementsOnGrid,
   newWatermarkElement,
   newBlurFreeDrawElement,
+  newHighlightElement,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -5927,6 +5928,7 @@ class App extends React.Component<AppProps, AppState> {
       type === "blur_freedraw" ||
       type === "text" ||
       type === "blur" ||
+      type === "highlight" ||
       type === "watermark" ||
       extraTools?.includes("serialNumber")
     );
@@ -8412,8 +8414,9 @@ class App extends React.Component<AppProps, AppState> {
       | "ellipse"
       | "iframe"
       | "embeddable"
-      | "blur"
-      | "watermark",
+      | "highlight"
+      | "watermark"
+      | "blur",
   ) {
     return this.state.currentItemRoundness === "round"
       ? {
@@ -8429,6 +8432,7 @@ class App extends React.Component<AppProps, AppState> {
       | ExcalidrawGenericElement["type"]
       | "embeddable"
       | "blur"
+      | "highlight"
       | "watermark",
     pointerDownState: PointerDownState,
   ): void => {
@@ -8471,6 +8475,14 @@ class App extends React.Component<AppProps, AppState> {
         ...baseElementAttributes,
         blur: this.state.currentItemBlur,
         filterType: this.state.currentItemFilterType,
+      });
+    } else if (elementType === "highlight") {
+      element = newHighlightElement({
+        ...baseElementAttributes,
+        maskColor: this.state.currentItemMaskColor,
+        maskOpacity: this.state.currentItemMaskOpacity,
+        shapeType: this.state.currentItemShapeType,
+        borderType: this.state.currentItemBorderType,
       });
     } else if (elementType === "watermark") {
       element = newWatermarkElement({

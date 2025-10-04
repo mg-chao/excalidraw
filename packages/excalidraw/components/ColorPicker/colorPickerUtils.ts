@@ -54,6 +54,7 @@ export const getMostUsedCustomColors = (
   type:
     | "elementBackground"
     | "elementStroke"
+    | "elementHighlightMaskColor"
     | "elementTextStroke"
     | "elementTextBackgroundColor",
   palette: ColorPaletteCustom,
@@ -61,6 +62,7 @@ export const getMostUsedCustomColors = (
   const elementColorTypeMap = {
     elementBackground: "backgroundColor",
     elementStroke: "strokeColor",
+    elementHighlightMaskColor: "maskColor",
     elementTextStroke: "textStrokeColor",
     elementTextBackgroundColor: "textBackgroundColor",
   };
@@ -164,4 +166,5 @@ export type ColorPickerType =
   | "elementBackground"
   | "elementStroke"
   | "elementTextStroke"
-  | "elementTextBackgroundColor";
+  | "elementTextBackgroundColor"
+  | "elementHighlightMaskColor";

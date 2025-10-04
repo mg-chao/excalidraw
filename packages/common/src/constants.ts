@@ -504,6 +504,7 @@ export const TOOL_TYPE = {
   embeddable: "embeddable",
   laser: "laser",
   blur: "blur",
+  highlight: "highlight",
   watermark: "watermark",
 } as const;
 

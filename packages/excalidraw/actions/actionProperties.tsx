@@ -28,6 +28,7 @@ import {
   getNonDeletedElements,
   hasTextStrokeColor,
   isFreeDrawElement,
+  isHighlightElement,
 } from "@excalidraw/element";
 
 import {
@@ -70,6 +71,7 @@ import type {
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawHighlightElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -89,7 +91,11 @@ import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
-import { Range, TextStrokeWidthRange } from "../components/Range";
+import {
+  HighlightMaskOpacityRange,
+  Range,
+  TextStrokeWidthRange,
+} from "../components/Range";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
@@ -133,6 +139,7 @@ import {
   ArrowheadCrowfootOneOrManyIcon,
   BrushIcon,
   HardPenIcon,
+  StrokeWidthNoneIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -174,6 +181,24 @@ export const changeProperty = (
       selectedElementIds.get(element.id) ||
       element.id === appState.editingTextElement?.id
     ) {
+      return callback(element);
+    }
+    return element;
+  });
+};
+
+export const changeHighlightMaskProperty = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  callback: (element: ExcalidrawElement) => ExcalidrawElement,
+  includeBoundText = false,
+) => {
+  const selectedElementIds = arrayToMap(
+    elements.filter((element) => isHighlightElement(element)),
+  );
+
+  return elements.map((element) => {
+    if (selectedElementIds.get(element.id)) {
       return callback(element);
     }
     return element;
@@ -530,6 +555,78 @@ export const actionChangeTextBackgroundColor = register({
           onChange={(color) =>
             updateData({ currentItemTextBackgroundColor: color })
           }
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+          compactMode={appState.stylesPanelMode === "compact"}
+        />
+      </>
+    );
+  },
+});
+
+export const actionChangeHighlightMaskColor = register({
+  name: "changeHighlightMaskColor",
+  label: "labels.highlightMaskColor",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      ...(value.currentItemMaskColor && {
+        elements: changeHighlightMaskProperty(
+          elements,
+          appState,
+          (el) => {
+            return isHighlightElement(el)
+              ? newElementWith(el as ExcalidrawHighlightElement, {
+                  maskColor: value.currentItemMaskColor,
+                })
+              : el;
+          },
+          true,
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: !!value.currentItemMaskColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <>
+        {appState.stylesPanelMode === "full" && (
+          <h3 aria-hidden="true">{t("labels.highlightMaskColor")}</h3>
+        )}
+        <ColorPicker
+          topPicks={
+            customOptions?.pickerRenders?.elementStrokeColors ??
+            DEFAULT_ELEMENT_STROKE_PICKS
+          }
+          palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
+          type="elementHighlightMaskColor"
+          label={t("labels.highlightMaskColor")}
+          color={getFormValue(
+            elements,
+            app,
+            (element) => {
+              if (isHighlightElement(element)) {
+                return element.maskColor;
+              }
+
+              return null;
+            },
+            (element) => isHighlightElement(element),
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemMaskColor || "transparent",
+          )}
+          onChange={(color) => updateData({ currentItemMaskColor: color })}
           elements={elements}
           appState={appState}
           updateData={updateData}
@@ -1029,6 +1126,36 @@ export const actionChangeOpacity = register({
   },
   PanelComponent: ({ app, updateData }) => (
     <Range updateData={updateData} app={app} testId="opacity" />
+  ),
+});
+
+export const actionChangeHighlightMaskOpacity = register({
+  name: "changeHighlightMaskOpacity",
+  label: "labels.highlightMaskOpacity",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeHighlightMaskProperty(
+        elements,
+        appState,
+        (el) =>
+          isHighlightElement(el)
+            ? newElementWith(el, {
+                maskOpacity: value,
+              })
+            : el,
+        true,
+      ),
+      appState: { ...appState, currentItemMaskOpacity: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ app, updateData }) => (
+    <HighlightMaskOpacityRange
+      updateData={updateData}
+      app={app}
+      testId="highlightMaskOpacity"
+    />
   ),
 });
 
@@ -2316,6 +2443,123 @@ export const actionChangeArrowType = register({
             onChange={(value) => updateData(value)}
           />
         </div>
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeHighlightShapeType = register({
+  name: "changeHighlightShapeType",
+  label: "labels.highlightShapeType",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (!isHighlightElement(el)) {
+          return el;
+        }
+
+        return newElementWith(el, {
+          shapeType: value,
+        });
+      }),
+      appState: { ...appState, currentItemShapeType: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.highlightShapeType")}</legend>
+        {customOptions?.pickerRenders?.ShapeTypeRadioSelection && (
+          <customOptions.pickerRenders.ShapeTypeRadioSelection
+            type="button"
+            options={[]}
+            value={getFormValue(
+              elements,
+              app,
+              (element) => {
+                if (isHighlightElement(element)) {
+                  return element.shapeType;
+                }
+
+                return null;
+              },
+              (element) => element.hasOwnProperty("shapeType"),
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemShapeType,
+            )}
+            onClick={(value) => {
+              updateData(value);
+            }}
+          />
+        )}
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeHighlightBorderType = register({
+  name: "changeHighlightBorderType",
+  label: "labels.highlightBorderType",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (!isHighlightElement(el)) {
+          return el;
+        }
+
+        return newElementWith(el, {
+          borderType: value,
+        });
+      }),
+      appState: { ...appState, currentItemBorderType: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.highlightBorderType")}</legend>
+        {customOptions?.pickerRenders?.BorderTypeRadioSelection && (
+          <customOptions.pickerRenders.BorderTypeRadioSelection
+            type="button"
+            options={[
+              {
+                value: "none",
+                text: t("labels.strokeStyle_none"),
+                icon: StrokeWidthNoneIcon,
+              },
+              {
+                value: "solid",
+                text: t("labels.strokeStyle_solid"),
+                icon: StrokeWidthBaseIcon,
+              },
+            ]}
+            value={getFormValue(
+              elements,
+              app,
+              (element) => {
+                if (isHighlightElement(element)) {
+                  return element.borderType;
+                }
+
+                return null;
+              },
+              (element) => element.hasOwnProperty("borderType"),
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemBorderType,
+            )}
+            onClick={(value) => {
+              updateData(value);
+            }}
+          />
+        )}
       </fieldset>
     );
   },

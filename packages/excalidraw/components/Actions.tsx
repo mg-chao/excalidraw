@@ -21,13 +21,9 @@ import {
   isArrowElement,
   hasStrokeColor,
   toolIsArrow,
-} from "@excalidraw/element";
-
-import {
   canChangeBlur,
   canChangeLayer,
-  hasStrokeColor,
-  toolIsArrow,
+  canChangeHighlight,
 } from "@excalidraw/element";
 
 import type {
@@ -203,11 +199,15 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    ((hasBackground(appState.activeTool.type) || extraHasBackgroundTool) &&
+    (((appState.activeTool.type !== "highlight" &&
+      hasBackground(appState.activeTool.type)) ||
+      extraHasBackgroundTool) &&
       !isTransparent(appState.currentItemBackgroundColor)) ||
     targetElements.some(
       (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
+        element.type !== "highlight" &&
+        hasBackground(element.type) &&
+        !isTransparent(element.backgroundColor),
     );
 
   const showLinkIcon =
@@ -278,6 +278,14 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canChangeBlur(element.type))) &&
         renderAction("changeBlurFilterType")}
 
+      {(canChangeHighlight(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeHighlight(element.type))) &&
+        renderAction("changeHighlightShapeType")}
+
+      {(canChangeHighlight(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeHighlight(element.type))) &&
+        renderAction("changeHighlightBorderType")}
+
       {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
@@ -330,6 +338,14 @@ export const SelectedShapeActions = ({
       {(canChangeBlur(appState.activeTool.type) ||
         targetElements.some((element) => canChangeBlur(element.type))) &&
         renderAction("changeBlur")}
+
+      {(canChangeHighlight(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeHighlight(element.type))) &&
+        renderAction("changeHighlightMaskColor")}
+
+      {(canChangeHighlight(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeHighlight(element.type))) &&
+        renderAction("changeHighlightMaskOpacity")}
 
       {renderAction("changeOpacity")}
 

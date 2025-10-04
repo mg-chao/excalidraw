@@ -35,6 +35,10 @@ export const getDefaultAppState = (): Omit<
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
     currentItemBlur: 50,
+    currentItemMaskColor: "#1e1e1e",
+    currentItemMaskOpacity: 50,
+    currentItemShapeType: "rect",
+    currentItemBorderType: "none",
     currentItemPenMode: "soft",
     currentItemFilterType: "blur",
     currentItemTextStrokeColor: "transparent",
@@ -163,6 +167,8 @@ const APP_STATE_STORAGE_CONF = (<
     export: false,
     server: false,
   },
+  currentItemShapeType: { browser: true, export: false, server: false },
+  currentItemBorderType: { browser: true, export: false, server: false },
   currentItemTextStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextStrokeColor: { browser: true, export: false, server: false },
   currentItemTextBackgroundColor: {
@@ -170,6 +176,12 @@ const APP_STATE_STORAGE_CONF = (<
     export: false,
     server: false,
   },
+  currentItemMaskColor: {
+    browser: true,
+    export: false,
+    server: false,
+  },
+  currentItemMaskOpacity: { browser: true, export: false, server: false },
   currentItemArrowType: {
     browser: true,
     export: false,

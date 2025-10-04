@@ -47,6 +47,7 @@ import type {
   ExcalidrawEmbeddableElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawHighlightElement,
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
@@ -115,7 +116,8 @@ type RectangularElement =
   | ExcalidrawImageElement
   | ExcalidrawIframeElement
   | ExcalidrawTextElement
-  | ExcalidrawSelectionElement;
+  | ExcalidrawSelectionElement
+  | ExcalidrawHighlightElement;
 
 // polygon
 export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(

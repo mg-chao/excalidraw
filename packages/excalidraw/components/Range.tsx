@@ -1,6 +1,9 @@
 import React, { useContext, useEffect } from "react";
 
-import { isBlurElement } from "@excalidraw/element/typeChecks";
+import {
+  isBlurElement,
+  isHighlightElement,
+} from "@excalidraw/element/typeChecks";
 
 import { t } from "../i18n";
 import { ExcalidrawPropsCustomOptionsContext } from "../types";
@@ -246,6 +249,93 @@ export const TextStrokeWidthRange = ({
             min="0"
             max="100"
             step="2"
+            onChange={(event) => {
+              updateData(+event.target.value);
+            }}
+            value={value}
+            className="range-input"
+            data-testid={testId}
+          />
+          <div className="value-bubble" ref={valueRef}>
+            {value !== 0 ? value : null}
+          </div>
+          <div className="zero-label">0</div>
+        </div>
+      )}
+    </label>
+  );
+};
+
+export const HighlightMaskOpacityRange = ({
+  updateData,
+  app,
+  testId,
+}: RangeProps) => {
+  const rangeRef = React.useRef<HTMLInputElement>(null);
+  const valueRef = React.useRef<HTMLDivElement>(null);
+  const selectedElements = app.scene.getSelectedElements(app.state);
+  let hasCommonMaskOpacity = true;
+  const firstElement = selectedElements.at(0);
+  const leastCommonMaskOpacity = selectedElements.reduce(
+    (acc, element) => {
+      if (!isHighlightElement(element)) {
+        return acc;
+      }
+
+      if (acc != null && acc !== element.maskOpacity) {
+        hasCommonMaskOpacity = false;
+      }
+      if (acc == null || acc > element.maskOpacity) {
+        return element.maskOpacity;
+      }
+      return acc;
+    },
+    isHighlightElement(firstElement) ? firstElement.maskOpacity : null,
+  );
+
+  const value = leastCommonMaskOpacity ?? app.state.currentItemMaskOpacity;
+
+  useEffect(() => {
+    if (rangeRef.current && valueRef.current) {
+      const rangeElement = rangeRef.current;
+      const valueElement = valueRef.current;
+      const inputWidth = rangeElement.offsetWidth;
+      const thumbWidth = 15; // 15 is the width of the thumb
+      const position =
+        (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
+      valueElement.style.left = `${position}px`;
+      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+    }
+  }, [value]);
+
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+  return (
+    <label className="control-label">
+      {t("labels.highlightMaskOpacity")}
+      {customOptions?.pickerRenders?.rangeRender ? (
+        customOptions?.pickerRenders?.rangeRender({
+          value,
+          onChange: (value: number) => {
+            updateData(value);
+          },
+          step: 10,
+          min: 0,
+          max: 100,
+        })
+      ) : (
+        <div className="range-wrapper">
+          <input
+            style={{
+              ["--color-slider-track" as string]: hasCommonMaskOpacity
+                ? undefined
+                : "var(--button-bg)",
+            }}
+            ref={rangeRef}
+            type="range"
+            min="0"
+            max="100"
+            step="10"
             onChange={(event) => {
               updateData(+event.target.value);
             }}

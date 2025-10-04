@@ -146,6 +146,7 @@ export type ElementShape = Drawable | Drawable[] | null;
 export type ElementShapes = {
   rectangle: Drawable;
   blur: Drawable;
+  highlight: Drawable;
   watermark: Drawable;
   ellipse: Drawable;
   diamond: Drawable;

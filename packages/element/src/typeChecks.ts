@@ -33,6 +33,7 @@ import type {
   ExcalidrawFlowchartNodeElement,
   ExcalidrawBlurElement,
   ExcalidrawLinearElementSubType,
+  ExcalidrawHighlightElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -71,6 +72,12 @@ export const isTextElement = (
   element: ExcalidrawElement | null | undefined,
 ): element is ExcalidrawTextElement => {
   return element != null && element.type === "text";
+};
+
+export const isHighlightElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawHighlightElement => {
+  return element != null && element.type === "highlight";
 };
 
 export const isFrameElement = (
@@ -285,6 +292,7 @@ export const isExcalidrawElement = (
     case "image":
     case "blur":
     case "watermark":
+    case "highlight":
     case "selection": {
       return true;
     }

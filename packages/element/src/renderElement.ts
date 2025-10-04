@@ -430,6 +430,7 @@ const drawElementOnCanvas = (
     // 渲染
     // Blur 和 Watermark 都放到 Snow Shot 上渲染
     case "blur":
+    case "highlight":
     case "blur_freedraw":
     case "watermark":
       break;
@@ -798,6 +799,11 @@ export const renderElement = (
   );
 
   switch (element.type) {
+    case "blur":
+    case "blur_freedraw":
+    case "highlight":
+    case "watermark":
+      break;
     case "magicframe":
     case "frame": {
       if (appState.frameRendering.enabled && appState.frameRendering.outline) {
@@ -836,7 +842,6 @@ export const renderElement = (
       }
       break;
     }
-    case "blur_freedraw":
     case "freedraw": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
@@ -885,8 +890,6 @@ export const renderElement = (
     case "image":
     case "text":
     case "iframe":
-    case "blur":
-    case "watermark":
     case "embeddable": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)

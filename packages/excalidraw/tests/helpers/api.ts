@@ -14,6 +14,7 @@ import {
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
+  newHighlightElement,
   newIframeElement,
   newImageElement,
   newLinearElement,
@@ -328,6 +329,7 @@ export class API {
           simulatePressure: false,
           points: rest.points,
           blur: appState.currentItemBlur,
+          filterType: appState.currentItemFilterType,
           ...base,
         });
         break;
@@ -374,8 +376,11 @@ export class API {
         element = newMagicFrameElement({ ...base, width, height });
         break;
       case "blur":
-            element = newBlurElement({ ...base, width, height, blur: appState.currentItemBlur});
+            element = newBlurElement({ ...base, width, height, blur: appState.currentItemBlur, filterType: appState.currentItemFilterType });
             break;
+      case "highlight":
+        element = newHighlightElement({ ...base, width, height, maskColor: appState.currentItemMaskColor, maskOpacity: appState.currentItemMaskOpacity, shapeType: appState.currentItemShapeType, borderType: appState.currentItemBorderType });
+        break;
       case "watermark":
         element = newWatermarkElement({ ...base, width, height, watermarkText: "", watermarkFontSize: appState.currentItemFontSize });
         break;
