@@ -108,6 +108,8 @@ import {
   MQ_MIN_TABLET,
   MQ_MAX_TABLET,
   TEXT_COLLISION_THRESHOLD,
+  MQ_MAX_HEIGHT_LANDSCAPE,
+  MQ_MAX_WIDTH_LANDSCAPE,
 } from "@excalidraw/common";
 
 import {
@@ -442,6 +444,8 @@ import { Toast } from "./Toast";
 import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
+
+import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
   RenderInteractiveSceneCallback,
@@ -2475,8 +2479,10 @@ class App extends React.Component<AppProps, AppState> {
   private isMobileBreakpoint = (width: number, height: number) => {
     return false;
 
-    const minSide = Math.min(width, height);
-    return minSide <= MQ_MAX_MOBILE;
+    return (
+      width <= MQ_MAX_MOBILE ||
+      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+    );
   };
 
   private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
@@ -7478,6 +7484,16 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
         !(
+          isLineElement(selectedElements[0]) &&
+          LinearElementEditor.getPointIndexUnderCursor(
+            selectedElements[0],
+            elementsMap,
+            this.state.zoom,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ) !== -1
+        ) &&
+        !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
         )
@@ -10888,7 +10904,10 @@ class App extends React.Component<AppProps, AppState> {
     const initialized = await Promise.all(
       placeholders.map(async (placeholder, i) => {
         try {
-          return await this.initializeImage(placeholder, imageFiles[i]);
+          return await this.initializeImage(
+            placeholder,
+            await normalizeFile(imageFiles[i]),
+          );
         } catch (error: any) {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
@@ -10978,16 +10997,44 @@ class App extends React.Component<AppProps, AppState> {
     if (imageFiles.length > 0 && this.isToolSupported("image")) {
       return this.insertImages(imageFiles, sceneX, sceneY);
     }
-
-    const libraryJSON = dataTransferList.getData(MIME_TYPES.excalidrawlib);
-    if (libraryJSON && typeof libraryJSON === "string") {
+    const excalidrawLibrary_ids = dataTransferList.getData(
+      MIME_TYPES.excalidrawlibIds,
+    );
+    const excalidrawLibrary_data = dataTransferList.getData(
+      MIME_TYPES.excalidrawlib,
+    );
+    if (excalidrawLibrary_ids || excalidrawLibrary_data) {
       try {
-        const libraryItems = parseLibraryJSON(libraryJSON);
-        this.addElementsFromPasteOrLibrary({
-          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
-          position: event,
-          files: null,
-        });
+        let libraryItems: LibraryItems | null = null;
+        if (excalidrawLibrary_ids) {
+          const { itemIds } = JSON.parse(
+            excalidrawLibrary_ids,
+          ) as ExcalidrawLibraryIds;
+          const allLibraryItems = await this.library.getLatestLibrary();
+          libraryItems = allLibraryItems.filter((item) =>
+            itemIds.includes(item.id),
+          );
+          // legacy library dataTransfer format
+        } else if (excalidrawLibrary_data) {
+          libraryItems = parseLibraryJSON(excalidrawLibrary_data);
+        }
+        if (libraryItems?.length) {
+          libraryItems = libraryItems.map((item) => ({
+            ...item,
+            // #6465
+            elements: duplicateElements({
+              type: "everything",
+              elements: item.elements,
+              randomizeSeed: true,
+            }).duplicatedElements,
+          }));
+
+          this.addElementsFromPasteOrLibrary({
+            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+            position: event,
+            files: null,
+          });
+        }
       } catch (error: any) {
         this.setState({ errorMessage: error.message });
       }
