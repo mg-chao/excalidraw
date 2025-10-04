@@ -339,6 +339,8 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canChangeBlur(element.type))) &&
         renderAction("changeBlur")}
 
+      {renderAction("changeOpacity")}
+
       {(canChangeHighlight(appState.activeTool.type) ||
         targetElements.some((element) => canChangeHighlight(element.type))) &&
         renderAction("changeHighlightMaskColor")}
@@ -346,8 +348,6 @@ export const SelectedShapeActions = ({
       {(canChangeHighlight(appState.activeTool.type) ||
         targetElements.some((element) => canChangeHighlight(element.type))) &&
         renderAction("changeHighlightMaskOpacity")}
-
-      {renderAction("changeOpacity")}
 
       {showLayerActions && (
         <fieldset>
