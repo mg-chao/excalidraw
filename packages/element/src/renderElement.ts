@@ -1188,7 +1188,7 @@ export function getFreedrawOutlinePoints(
   const options: StrokeOptions = {
     simulatePressure:
       element.penMode === "hard" ? false : element.simulatePressure,
-    size: element.strokeWidth * 4.25,
+    size: element.strokeWidth * (element.penMode === "hard" ? 2.7 : 4.25),
     thinning: 0.6,
     smoothing: 0.5,
     streamline: 0.5,
