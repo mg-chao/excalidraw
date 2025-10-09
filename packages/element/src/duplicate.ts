@@ -71,6 +71,20 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
   }
 
   copy.id = randomId();
+
+  // 特殊处理序列号的复制
+  if (element.id.startsWith("snow-shot_serial-number_")) {
+    // snow-shot_serial-number_${id}-ellipse
+    const id = new Date().valueOf();
+    if (element.id.endsWith("ellipse")) {
+      copy.id = `snow-shot_serial-number_${id}-ellipse`;
+    } else if (element.id.endsWith("text")) {
+      copy.id = `snow-shot_serial-number_${id}-text`;
+    } else if (element.id.endsWith("-group-number")) {
+      copy.id = `snow-shot_serial-number_${id}-group-number`;
+    }
+  }
+
   copy.updated = getUpdatedTimestamp();
   if (randomizeSeed) {
     copy.seed = randomInteger();
