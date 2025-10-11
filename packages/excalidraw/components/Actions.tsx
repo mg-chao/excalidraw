@@ -24,6 +24,7 @@ import {
   canChangeBlur,
   canChangeLayer,
   canChangeHighlight,
+  canChangeTextStrokeColorProp,
 } from "@excalidraw/element";
 
 import type {
@@ -138,7 +139,7 @@ export const canChangeTextStrokeColor = (
 
   return (
     hasTextStrokeColor(appState.activeTool.type) ||
-    targetElements.some((element) => hasTextStrokeColor(element.type))
+    targetElements.some((element) => canChangeTextStrokeColorProp(element))
   );
 };
 
@@ -257,6 +258,7 @@ export const SelectedShapeActions = ({
         <customOptions.pickerRenders.SubToolEditor
           appState={appState}
           targetElements={targetElements}
+          isSerialNumberTool={isSerialNumberTool}
         />
       )}
 

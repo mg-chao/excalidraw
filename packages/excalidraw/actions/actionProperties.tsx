@@ -25,6 +25,7 @@ import {
 
 import {
   canBecomePolygon,
+  canChangeTextStrokeColorProp,
   getNonDeletedElements,
   hasTextStrokeColor,
   isFreeDrawElement,
@@ -406,7 +407,7 @@ export const actionChangeTextStrokeColor = register({
           elements,
           appState,
           (el) => {
-            return hasTextStrokeColor(el.type)
+            return canChangeTextStrokeColorProp(el)
               ? newElementWith(el as ExcalidrawTextElement, {
                   textStrokeColor: value.currentItemTextStrokeColor,
                 })
@@ -491,7 +492,7 @@ export const actionChangeTextBackgroundColor = register({
           elements,
           appState,
           (el) => {
-            return hasTextStrokeColor(el.type)
+            return canChangeTextStrokeColorProp(el)
               ? newElementWith(el as ExcalidrawTextElement, {
                   textBackgroundColor: value.currentItemTextBackgroundColor,
                 })
@@ -1082,13 +1083,13 @@ export const actionChangeTextStrokeWidth = register({
         elements,
         appState,
         (el) => {
-          if (!isTextElement(el)) {
+          if (!canChangeTextStrokeColorProp(el)) {
             return el;
           }
 
           return newElementWith(el, {
             textStrokeWidth: value,
-          });
+          } as any);
         },
         true,
       ),
@@ -1759,7 +1760,10 @@ export const actionChangeTextAlign = register({
         elements,
         appState,
         (oldElement) => {
-          if (isTextElement(oldElement)) {
+          if (
+            isTextElement(oldElement) &&
+            !oldElement.id.startsWith("snow-shot_serial-number_")
+          ) {
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
               { textAlign: value },
