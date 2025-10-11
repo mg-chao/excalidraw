@@ -606,6 +606,7 @@ export interface ExcalidrawPropsCustomOptions {
     SubToolEditor?: React.ComponentType<{
       appState: UIAppState;
       targetElements: ExcalidrawElement[];
+      isSerialNumberTool: boolean;
     }>;
     SerialNumberEditor?: React.ComponentType<{
       appState: UIAppState;

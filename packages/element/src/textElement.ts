@@ -428,7 +428,10 @@ export const suppportsHorizontalAlign = (
       return true;
     }
 
-    return isTextElement(element);
+    return (
+      isTextElement(element) &&
+      !element.id.startsWith("snow-shot_serial-number_")
+    );
   });
 };
 

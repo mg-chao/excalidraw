@@ -94,6 +94,7 @@ export const textWysiwyg = ({
   excalidrawContainer,
   app,
   autoSelect = true,
+  pointerPosition,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -110,6 +111,10 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
+  pointerPosition?: {
+    x: number;
+    y: number;
+  };
 }): SubmitHandler => {
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
@@ -758,10 +763,22 @@ export const textWysiwyg = ({
     window.addEventListener("resize", updateWysiwygStyle);
   }
 
-  editable.onpointerdown = (event) => event.stopPropagation();
-  editable.onmousedown = (event) => event.stopPropagation();
+  editable.onpointerdown = (event) => {
+    event.stopPropagation();
+  };
+  editable.onmousedown = (event) => {
+    event.stopPropagation();
+  };
   editable.onmouseup = (event) => event.stopPropagation();
   editable.onmousemove = (event) => event.stopPropagation();
+  editable.ondblclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  editable.onclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg

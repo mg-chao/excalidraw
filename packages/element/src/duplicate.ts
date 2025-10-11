@@ -72,16 +72,17 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 
   copy.id = randomId();
 
+  let serialNumberId: number | undefined = undefined;
   // 特殊处理序列号的复制
   if (element.id.startsWith("snow-shot_serial-number_")) {
     // snow-shot_serial-number_${id}-ellipse
-    const id = new Date().valueOf();
+    serialNumberId = new Date().valueOf();
     if (element.id.endsWith("ellipse")) {
-      copy.id = `snow-shot_serial-number_${id}-ellipse`;
+      copy.id = `snow-shot_serial-number_${serialNumberId}-ellipse`;
     } else if (element.id.endsWith("text")) {
-      copy.id = `snow-shot_serial-number_${id}-text`;
+      copy.id = `snow-shot_serial-number_${serialNumberId}-text`;
     } else if (element.id.endsWith("-group-number")) {
-      copy.id = `snow-shot_serial-number_${id}-group-number`;
+      copy.id = `snow-shot_serial-number_${serialNumberId}-group-number`;
     }
   }
 
@@ -95,6 +96,14 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
     copy.groupIds,
     editingGroupId,
     (groupId) => {
+      if (
+        serialNumberId &&
+        groupId.startsWith("snow-shot_serial-number_") &&
+        groupId.endsWith("-group-number")
+      ) {
+        return `snow-shot_serial-number_${serialNumberId}-group-number`;
+      }
+
       if (!groupIdMapForOperation.has(groupId)) {
         groupIdMapForOperation.set(groupId, randomId());
       }

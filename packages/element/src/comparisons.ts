@@ -19,6 +19,12 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
 
 export const hasTextStrokeColor = (type: ElementOrToolType) => type === "text";
 
+export const canChangeTextStrokeColorProp = (element: {
+  type: string;
+  id: string;
+}) =>
+  element.type === "text" && !element.id.startsWith("snow-shot_serial-number_");
+
 export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
   type === "iframe" ||

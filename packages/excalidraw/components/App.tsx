@@ -5034,6 +5034,10 @@ class App extends React.Component<AppProps, AppState> {
     }: {
       isExistingElement?: boolean;
     },
+    pointerPosition?: {
+      x: number;
+      y: number;
+    },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
@@ -5140,6 +5144,7 @@ class App extends React.Component<AppProps, AppState> {
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
       autoSelect: !this.device.isTouchScreen,
+      pointerPosition,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -5560,9 +5565,16 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (autoEdit || existingTextElement || container) {
-      this.handleTextWysiwyg(element, {
-        isExistingElement: !!existingTextElement,
-      });
+      this.handleTextWysiwyg(
+        element,
+        {
+          isExistingElement: !!existingTextElement,
+        },
+        {
+          x: sceneX,
+          y: sceneY,
+        },
+      );
     } else {
       this.setState({
         newElement: element,
@@ -5748,6 +5760,10 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           activeEmbeddable: { element: hitElement, state: "active" },
         });
+        return;
+      }
+
+      if (hitElement?.type === "text") {
         return;
       }
 
@@ -6986,7 +7002,8 @@ class App extends React.Component<AppProps, AppState> {
     } else if (
       this.state.activeTool.type === "text" ||
       (pointerDownState.hit.element?.type === "text" &&
-        this.isASelectedElement(pointerDownState.hit.element))
+        this.isASelectedElement(pointerDownState.hit.element) &&
+        !pointerDownState.hit.element.id.startsWith("snow-shot_serial-number_"))
     ) {
       const hitElement = this.getElementAtPosition(
         pointerDownState.origin.x,

@@ -231,7 +231,10 @@ export const getSelectedGroupIds = (
   appState: InteractiveCanvasAppState,
 ): GroupId[] =>
   Object.entries(appState.selectedGroupIds)
-    .filter(([groupId, isSelected]) => isSelected)
+    .filter(
+      ([groupId, isSelected]) =>
+        isSelected && !groupId.startsWith("snow-shot_serial-number_"),
+    )
     .map(([groupId, isSelected]) => groupId);
 
 // given a list of elements, return the the actual group ids that should be selected
