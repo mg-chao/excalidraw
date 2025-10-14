@@ -1994,7 +1994,7 @@ export const actionChangeRoundness = register({
     return (
       <fieldset>
         <legend>{t("labels.edges")}</legend>
-        <div>
+        <div style={{ display: "flex" }}>
           <RadioSelection
             group="edges"
             options={[
