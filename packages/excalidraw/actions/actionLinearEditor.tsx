@@ -190,6 +190,7 @@ export const actionTogglePolygon = register({
     };
   },
   PanelComponent: ({ appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
     const selectedElements = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
     });
@@ -218,6 +219,19 @@ export const actionTogglePolygon = register({
         ? "labels.polygon.breakPolygon"
         : "labels.polygon.convertToPolygon",
     );
+
+    if (customOptions?.pickerRenders?.CustomButtonIcon) {
+      return (
+        <customOptions.pickerRenders.CustomButtonIcon
+          icon={polygonIcon}
+          title={label}
+          aria-label={label}
+          active={allPolygon}
+          onClick={() => updateData(null)}
+          style={{ marginLeft: "auto" }}
+        />
+      );
+    }
 
     return (
       <ButtonIcon
