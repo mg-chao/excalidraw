@@ -39,6 +39,7 @@ import {
 import {
   hasBoundTextElement,
   isFreeDrawElement,
+  isHighlightElement,
   isIframeLikeElement,
   isImageElement,
   isLinearElement,
@@ -76,7 +77,8 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
     !isTransparent(element.backgroundColor) ||
     hasBoundTextElement(element) ||
     isIframeLikeElement(element) ||
-    isTextElement(element);
+    isTextElement(element) ||
+    isHighlightElement(element);
 
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
