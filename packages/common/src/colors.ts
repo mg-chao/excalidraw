@@ -74,7 +74,7 @@ export const COLOR_PALETTE = {
   orange: getSpecificColorShades("orange", ELEMENTS_PALETTE_SHADE_INDEXES),
   // radix bronze shades 3,5,7,9,11
   bronze: ["#f8f1ee", "#eaddd7", "#d2bab0", "#a18072", "#846358"],
-} as ColorPalette;
+} as unknown as ColorPalette;
 
 const COMMON_ELEMENT_SHADES = pick(COLOR_PALETTE, [
   "cyan",
