@@ -14,7 +14,7 @@ import {
   replaceAllElementsInFrame,
 } from "@excalidraw/element";
 
-import { KEYS, randomId, arrayToMap, getShortcutKey } from "@excalidraw/common";
+import { KEYS, randomId, arrayToMap } from "@excalidraw/common";
 
 import {
   getSelectedGroupIds,
@@ -50,6 +50,8 @@ import {
   type AppClassProperties,
   type AppState,
 } from "../types";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 

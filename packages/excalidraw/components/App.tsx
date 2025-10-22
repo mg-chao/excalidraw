@@ -80,7 +80,6 @@ import {
   wrapEvent,
   updateObject,
   updateActiveTool,
-  getShortcutKey,
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
@@ -179,7 +178,7 @@ import {
   getContainerElement,
   isValidTextContainer,
   redrawTextBoundingBox,
-  shouldShowBoundingBox,
+  hasBoundingBox,
   getFrameChildren,
   isCursorInFrame,
   addElementsToFrame,
@@ -416,6 +415,8 @@ import { isMaybeMermaidDefinition } from "../mermaid";
 import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
+
+import { getShortcutKey } from "../shortcut";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -680,14 +681,9 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
-  defaultSelectionTool: "selection" | "lasso" = "selection";
-
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
-    this.defaultSelectionTool = isMobileOrTablet()
-      ? ("lasso" as const)
-      : ("selection" as const);
     const {
       excalidrawAPI,
       viewModeEnabled = false,
@@ -1569,7 +1565,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
-    const { renderTopRightUI, renderCustomStats } = this.props;
+    const { renderTopRightUI, renderTopLeftUI, renderCustomStats } = this.props;
 
     const sceneNonce = this.scene.getSceneNonce();
     const { elementsMap, visibleElements } =
@@ -1655,6 +1651,7 @@ class App extends React.Component<AppProps, AppState> {
                           onPenModeToggle={this.togglePenMode}
                           onHandToolToggle={this.onHandToolToggle}
                           langCode={getLanguage().code}
+                          renderTopLeftUI={renderTopLeftUI}
                           renderTopRightUI={renderTopRightUI}
                           renderCustomStats={renderCustomStats}
                           showExitZenModeBtn={
@@ -1667,7 +1664,7 @@ class App extends React.Component<AppProps, AppState> {
                             !this.state.isLoading &&
                             this.state.showWelcomeScreen &&
                             this.state.activeTool.type ===
-                              this.defaultSelectionTool &&
+                              this.state.preferredSelectionTool.type &&
                             !this.state.zenModeEnabled &&
                             !this.scene.getElementsIncludingDeleted().length
                           }
@@ -2423,6 +2420,14 @@ class App extends React.Component<AppProps, AppState> {
       deleteInvisibleElements: true,
     });
     const activeTool = scene.appState.activeTool;
+
+    if (!scene.appState.preferredSelectionTool.initialized) {
+      scene.appState.preferredSelectionTool = {
+        type: this.device.editor.isMobile ? "lasso" : "selection",
+        initialized: true,
+      };
+    }
+
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -2437,12 +2442,13 @@ class App extends React.Component<AppProps, AppState> {
         activeTool.type === "selection"
           ? {
               ...activeTool,
-              type: this.defaultSelectionTool,
+              type: scene.appState.preferredSelectionTool.type,
             }
           : scene.appState.activeTool,
       isLoading: false,
       toast: this.state.toast,
     };
+
     if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
@@ -2537,16 +2543,29 @@ class App extends React.Component<AppProps, AppState> {
       canFitSidebar: editorWidth > sidebarBreakpoint,
     });
 
+    const stylesPanelMode =
+      // NOTE: we could also remove the isMobileOrTablet check here and
+      // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
+      // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
+      this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
+        ? "compact"
+        : this.isMobileBreakpoint(editorWidth, editorHeight)
+        ? "mobile"
+        : "full";
+
     // also check if we need to update the app state
-    this.setState({
-      stylesPanelMode:
-        // NOTE: we could also remove the isMobileOrTablet check here and
-        // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
-        // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
-        this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
-          ? "compact"
-          : "full",
-    });
+    this.setState((prevState) => ({
+      stylesPanelMode,
+      // reset to box selection mode if the UI changes to full
+      // where you'd not be able to change the mode yourself currently
+      preferredSelectionTool:
+        stylesPanelMode === "full"
+          ? {
+              type: "selection",
+              initialized: true,
+            }
+          : prevState.preferredSelectionTool,
+    }));
 
     if (prevEditorState !== nextEditorState) {
       this.device = { ...this.device, editor: nextEditorState };
@@ -3348,7 +3367,10 @@ class App extends React.Component<AppProps, AppState> {
 
       await this.insertClipboardContent(data, filesList, isPlainPaste);
 
-      this.setActiveTool({ type: this.defaultSelectionTool }, true);
+      this.setActiveTool(
+        { type: this.state.preferredSelectionTool.type },
+        true,
+      );
       event?.preventDefault();
     },
   );
@@ -3494,7 +3516,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: this.defaultSelectionTool }, true);
+    this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
 
     if (opts.fitToContent) {
       this.scrollToContent(duplicatedElements, {
@@ -3706,7 +3728,7 @@ class App extends React.Component<AppProps, AppState> {
           ...updateActiveTool(
             this.state,
             prevState.activeTool.locked
-              ? { type: this.defaultSelectionTool }
+              ? { type: this.state.preferredSelectionTool.type }
               : prevState.activeTool,
           ),
           locked: !prevState.activeTool.locked,
@@ -4048,7 +4070,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (appState) {
-        this.setState(appState);
+        this.setState({
+          ...appState,
+          // keep existing stylesPanelMode as it needs to be preserved
+          // or set at startup
+          stylesPanelMode: this.state.stylesPanelMode,
+        } as Pick<AppState, K> | null);
       }
 
       if (elements) {
@@ -4716,7 +4743,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
         if (this.state.activeTool.type === "laser") {
-          this.setActiveTool({ type: this.defaultSelectionTool });
+          this.setActiveTool({ type: this.state.preferredSelectionTool.type });
         } else {
           this.setActiveTool({ type: "laser" });
         }
@@ -5331,7 +5358,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       considerBoundingBox &&
       this.state.selectedElementIds[element.id] &&
-      shouldShowBoundingBox([element], this.state)
+      hasBoundingBox([element], this.state)
     ) {
       // if hitting the bounding box, return early
       // but if not, we should check for other cases as well (e.g. frame name)
@@ -5610,7 +5637,7 @@ class App extends React.Component<AppProps, AppState> {
     // we should only be able to double click when mode is selection
     if (
       !(
-        this.state.activeTool.type === this.defaultSelectionTool ||
+        this.state.activeTool.type === this.state.preferredSelectionTool.type ||
         this.state.activeTool.type === "text"
       )
     ) {
@@ -6304,7 +6331,13 @@ class App extends React.Component<AppProps, AppState> {
         (!this.state.selectedLinearElement ||
           this.state.selectedLinearElement.hoverPointIndex === -1) &&
         this.state.openDialog?.name !== "elementLinkSelector" &&
-        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
+        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0])) &&
+        // HACK: Disable transform handles for linear elements on mobile until a
+        // better way of showing them is found
+        !(
+          isLinearElement(selectedElements[0]) &&
+          (isMobileOrTablet() || selectedElements[0].points.length === 2)
+        )
       ) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -6683,6 +6716,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.snapLines) {
       this.setAppState({ snapLines: [] });
+    }
+
+    if (this.state.openPopup) {
+      this.setState({ openPopup: null });
     }
 
     this.updateGestureOnPointerDown(event);
@@ -7503,14 +7540,8 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
         !(
-          isLineElement(selectedElements[0]) &&
-          LinearElementEditor.getPointIndexUnderCursor(
-            selectedElements[0],
-            elementsMap,
-            this.state.zoom,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          ) !== -1
+          isLinearElement(selectedElements[0]) &&
+          (isMobileOrTablet() || selectedElements[0].points.length === 2)
         ) &&
         !(
           this.state.selectedLinearElement &&
@@ -8016,7 +8047,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.activeTool.locked) {
       this.setState({
         activeTool: updateActiveTool(this.state, {
-          type: this.defaultSelectionTool,
+          type: this.state.preferredSelectionTool.type,
         }),
       });
     }
@@ -9858,7 +9889,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((prevState) => ({
               newElement: null,
               activeTool: updateActiveTool(this.state, {
-                type: this.defaultSelectionTool,
+                type: this.state.preferredSelectionTool.type,
               }),
               selectedElementIds: makeNextSelectedElementIds(
                 {
@@ -10498,7 +10529,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement: null,
           suggestedBindings: [],
           activeTool: updateActiveTool(this.state, {
-            type: this.defaultSelectionTool,
+            type: this.state.preferredSelectionTool.type,
           }),
         });
       } else {
@@ -10728,7 +10759,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           newElement: null,
           activeTool: updateActiveTool(this.state, {
-            type: this.defaultSelectionTool,
+            type: this.state.preferredSelectionTool.type,
           }),
         },
         () => {
@@ -11192,7 +11223,7 @@ class App extends React.Component<AppProps, AppState> {
           event.nativeEvent.pointerType === "pen" &&
           // always allow if user uses a pen secondary button
           event.button !== POINTER_BUTTON.SECONDARY)) &&
-      this.state.activeTool.type !== this.defaultSelectionTool
+      this.state.activeTool.type !== this.state.preferredSelectionTool.type
     ) {
       return;
     }
@@ -11651,6 +11682,17 @@ class App extends React.Component<AppProps, AppState> {
       return [actionCopy, ...options];
     }
 
+    const zIndexActions: ContextMenuItems =
+      this.state.stylesPanelMode === "full"
+        ? [
+            CONTEXT_MENU_SEPARATOR,
+            actionSendBackward,
+            actionBringForward,
+            actionSendToBack,
+            actionBringToFront,
+          ]
+        : [];
+
     return [
       CONTEXT_MENU_SEPARATOR,
       actionCut,
@@ -11676,11 +11718,7 @@ class App extends React.Component<AppProps, AppState> {
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
-      CONTEXT_MENU_SEPARATOR,
-      actionSendBackward,
-      actionBringForward,
-      actionSendToBack,
-      actionBringToFront,
+      ...zIndexActions,
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,

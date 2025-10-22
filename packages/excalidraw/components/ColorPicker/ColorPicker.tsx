@@ -19,7 +19,7 @@ import { useExcalidrawContainer } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
-import { backgroundIcon, slashIcon, strokeIcon } from "../icons";
+import { slashIcon, strokeIcon } from "../icons";
 
 import {
   ExcalidrawPropsCustomOptionsContext,
@@ -219,6 +219,11 @@ const ColorPickerPopupContent = ({
           type={type}
           elements={elements}
           updateData={updateData}
+          showTitle={
+            appState.stylesPanelMode === "compact" ||
+            appState.stylesPanelMode === "mobile"
+          }
+          showHotKey={appState.stylesPanelMode !== "mobile"}
         >
           {colorInputJSX}
         </Picker>
@@ -233,7 +238,7 @@ const ColorPickerTrigger = ({
   label,
   color,
   type,
-  compactMode = false,
+  stylesPanelMode,
   mode = "background",
   onToggle,
   editingTextElement,
@@ -241,7 +246,7 @@ const ColorPickerTrigger = ({
   color: string | null;
   label: string;
   type: ColorPickerType;
-  compactMode?: boolean;
+  stylesPanelMode?: AppState["stylesPanelMode"];
   mode?: "background" | "stroke";
   onToggle: () => void;
   editingTextElement?: boolean;
@@ -266,6 +271,9 @@ const ColorPickerTrigger = ({
         "is-transparent": !color || color === "transparent",
         "has-outline":
           !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
+        "compact-sizing":
+          stylesPanelMode === "compact" || stylesPanelMode === "mobile",
+        "mobile-border": stylesPanelMode === "mobile",
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
@@ -278,20 +286,10 @@ const ColorPickerTrigger = ({
       onClick={handleClick}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
-      {compactMode && color && (
-        <div className="color-picker__button-background">
-          {mode === "background" ? (
-            <span
-              style={{
-                color:
-                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                    ? "#fff"
-                    : "#111",
-              }}
-            >
-              {backgroundIcon}
-            </span>
-          ) : (
+      {(stylesPanelMode === "compact" || stylesPanelMode === "mobile") &&
+        color &&
+        mode === "stroke" && (
+          <div className="color-picker__button-background">
             <span
               style={{
                 color:
@@ -302,9 +300,8 @@ const ColorPickerTrigger = ({
             >
               {strokeIcon}
             </span>
-          )}
-        </div>
-      )}
+          </div>
+        )}
     </Popover.Trigger>
   );
 };
@@ -319,9 +316,13 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
-  compactMode = false,
 }: ColorPickerProps) => {
   const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+  const compactMode =
+    type !== "canvasBackground" &&
+    (appState.stylesPanelMode === "compact" ||
+      appState.stylesPanelMode === "mobile");
 
   const renderPopover = () => {
     if (customOptions?.pickerRenders?.colorPickerPopoverRender) {
@@ -350,7 +351,7 @@ export const ColorPicker = ({
           color={color}
           label={label}
           type={type}
-          compactMode={compactMode}
+          stylesPanelMode={appState.stylesPanelMode}
           mode={type === "elementStroke" ? "stroke" : "background"}
           editingTextElement={!!appState.editingTextElement}
           onToggle={() => {

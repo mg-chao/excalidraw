@@ -2,7 +2,7 @@ import { getNonDeletedElements } from "@excalidraw/element";
 
 import { isFrameLikeElement } from "@excalidraw/element";
 
-import { CODES, KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
+import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 
@@ -33,6 +33,8 @@ import {
   type AppClassProperties,
   type AppState,
 } from "../types";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 

@@ -92,6 +92,7 @@ interface LayerUIProps {
   onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
+  renderTopLeftUI?: ExcalidrawProps["renderTopLeftUI"];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   UIOptions: AppProps["UIOptions"];
@@ -151,6 +152,7 @@ const LayerUI = ({
   onHandToolToggle,
   onPenModeToggle,
   showExitZenModeBtn,
+  renderTopLeftUI,
   renderTopRightUI,
   renderCustomStats,
   UIOptions,
@@ -383,7 +385,7 @@ const LayerUI = ({
                             />
 
                             <ShapesSwitcher
-                              appState={appState}
+                              setAppState={setAppState}
                               activeTool={appState.activeTool}
                               UIOptions={UIOptions}
                               app={app}
@@ -599,13 +601,11 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onLockToggle={onLockToggle}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
+          renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
-          renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
-          device={device}
           renderWelcomeScreen={renderWelcomeScreen}
           UIOptions={UIOptions}
         />

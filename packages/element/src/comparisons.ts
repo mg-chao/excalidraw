@@ -11,11 +11,13 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "highlight";
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
-  type !== "image" &&
-  type !== "frame" &&
-  type !== "magicframe" &&
-  type !== "blur" &&
-  type !== "blur_freedraw";
+  type === "rectangle" ||
+  type === "ellipse" ||
+  type === "diamond" ||
+  type === "freedraw" ||
+  type === "arrow" ||
+  type === "line" ||
+  type === "text";
 
 export const hasTextStrokeColor = (type: ElementOrToolType) => type === "text";
 

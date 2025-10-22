@@ -7,11 +7,12 @@ import {
   EVENT,
   KEYS,
   capitalizeString,
-  getShortcutKey,
   isWritableElement,
 } from "@excalidraw/common";
 
 import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
+import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
 
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
@@ -476,7 +477,6 @@ function CommandPaletteInner({
           },
           perform: () => {
             setAppState((prevState) => ({
-              openMenu: prevState.openMenu === "shape" ? null : "shape",
               openPopup: "elementStroke",
             }));
           },
@@ -496,7 +496,6 @@ function CommandPaletteInner({
           },
           perform: () => {
             setAppState((prevState) => ({
-              openMenu: prevState.openMenu === "shape" ? null : "shape",
               openPopup: "elementBackground",
             }));
           },
@@ -839,7 +838,12 @@ function CommandPaletteInner({
 
     let matchingCommands =
       commandSearch?.length > 1
-        ? [...allCommands, ...libraryCommands]
+        ? [
+            ...allCommands
+              .filter(isCommandAvailable)
+              .sort((a, b) => a.order - b.order),
+            ...libraryCommands,
+          ]
         : allCommands
             .filter(isCommandAvailable)
             .sort((a, b) => a.order - b.order);

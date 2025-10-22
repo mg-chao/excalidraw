@@ -80,8 +80,6 @@ export type ActionName =
   | "changeArrowProperties"
   | "changeOpacity"
   | "changeFontSize"
-  | "toggleCanvasMenu"
-  | "toggleEditMenu"
   | "undo"
   | "redo"
   | "finalize"

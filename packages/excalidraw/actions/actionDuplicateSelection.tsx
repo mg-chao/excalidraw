@@ -1,8 +1,8 @@
 import {
   DEFAULT_GRID_SIZE,
   KEYS,
+  MOBILE_ACTION_BUTTON_BG,
   arrayToMap,
-  getShortcutKey,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -29,6 +29,7 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 
 import { ExcalidrawPropsCustomOptionsContext } from "../types";
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
@@ -123,6 +124,10 @@ export const actionDuplicateSelection = register({
           getNonDeletedElements(elements),
           appState,
         ),
+        disabled: !isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
       });
     }
 
@@ -135,10 +140,18 @@ export const actionDuplicateSelection = register({
         )}`}
         aria-label={t("labels.duplicateSelection")}
         onClick={() => updateData(null)}
-        visible={isSomeElementSelected(
+        disabled={
+        !isSomeElementSelected(
           getNonDeletedElements(elements),
           appState,
-        )}
+        )
+      }
+      style={{
+        ...(appState.stylesPanelMode === "mobile" &&
+        appState.openPopup !== "compactOtherProperties"
+          ? MOBILE_ACTION_BUTTON_BG
+          : {}),
+      }}
       />
     );
   },

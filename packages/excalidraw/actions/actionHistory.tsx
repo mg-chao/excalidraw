@@ -1,4 +1,10 @@
-import { isWindows, KEYS, matchKey, arrayToMap } from "@excalidraw/common";
+import {
+  isWindows,
+  KEYS,
+  matchKey,
+  arrayToMap,
+  MOBILE_ACTION_BUTTON_BG,
+} from "@excalidraw/common";
 
 import { useContext } from "react";
 
@@ -72,7 +78,7 @@ export const createUndoAction: ActionCreator = (history) => ({
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
-  PanelComponent: ({ updateData, data }) => {
+  PanelComponent: ({ appState, updateData, data }) => {
     const { isUndoStackEmpty } = useEmitter<HistoryChangedEvent>(
       history.onHistoryChangedEmitter,
       new HistoryChangedEvent(
@@ -96,6 +102,11 @@ export const createUndoAction: ActionCreator = (history) => ({
         size={data?.size || "medium"}
         disabled={isUndoStackEmpty}
         data-testid="button-undo"
+        style={{
+          ...(appState.stylesPanelMode === "mobile"
+            ? MOBILE_ACTION_BUTTON_BG
+            : {}),
+        }}
       />
     );
   },
@@ -114,7 +125,7 @@ export const createRedoAction: ActionCreator = (history) => ({
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||
     (isWindows && event.ctrlKey && !event.shiftKey && matchKey(event, KEYS.Y)),
-  PanelComponent: ({ updateData, data }) => {
+  PanelComponent: ({ appState, updateData, data }) => {
     const { isRedoStackEmpty } = useEmitter(
       history.onHistoryChangedEmitter,
       new HistoryChangedEvent(
@@ -138,6 +149,11 @@ export const createRedoAction: ActionCreator = (history) => ({
         size={data?.size || "medium"}
         disabled={isRedoStackEmpty}
         data-testid="button-redo"
+        style={{
+          ...(appState.stylesPanelMode === "mobile"
+            ? MOBILE_ACTION_BUTTON_BG
+            : {}),
+        }}
       />
     );
   },
