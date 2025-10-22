@@ -17,7 +17,6 @@ import {
   randomInteger,
   arrayToMap,
   getFontFamilyString,
-  getShortcutKey,
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
@@ -158,6 +157,8 @@ import {
   withCaretPositionPreservation,
   restoreCaretPosition,
 } from "../hooks/useTextEditorFocus";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
@@ -389,7 +390,10 @@ export const actionChangeStrokeColor = register({
           elements={elements}
           appState={appState}
           updateData={updateData}
-          compactMode={appState.stylesPanelMode === "compact"}
+          compactMode={
+          appState.stylesPanelMode === "compact" ||
+          appState.stylesPanelMode === "mobile"
+        }
         />
       </>
     );
@@ -720,7 +724,10 @@ export const actionChangeBackgroundColor = register({
           elements={elements}
           appState={appState}
           updateData={updateData}
-          compactMode={appState.stylesPanelMode === "compact"}
+          compactMode={
+          appState.stylesPanelMode === "compact" ||
+          appState.stylesPanelMode === "mobile"
+        }
         />
       </>
     );
@@ -827,10 +834,8 @@ export const actionChangeStrokeWidth = register({
 
     return (
       <fieldset>
-        {appState.stylesPanelMode === "full" && (
           <legend>{t("labels.strokeWidth")}</legend>
-        )}
-        <div>
+          <div>
           {customOptions?.pickerRenders?.ChangeStrokeWidthSlider ? (
             <customOptions.pickerRenders.ChangeStrokeWidthSlider
               value={getFormValue(
@@ -980,9 +985,7 @@ export const actionChangeSloppiness = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.stylesPanelMode === "full" && (
-        <legend>{t("labels.sloppiness")}</legend>
-      )}
+      <legend>{t("labels.sloppiness")}</legend>
       <div>
         <RadioSelection
           group="sloppiness"
@@ -1035,9 +1038,7 @@ export const actionChangeStrokeStyle = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.stylesPanelMode === "full" && (
-        <legend>{t("labels.strokeStyle")}</legend>
-      )}
+      <legend>{t("labels.strokeStyle")}</legend>
       <div>
         <RadioSelection
           group="strokeStyle"
@@ -1298,7 +1299,8 @@ export const actionChangeFontSize = register({
               onChange={(value) => {
                 withCaretPositionPreservation(
                   () => updateData(value),
-                  appState.stylesPanelMode === "compact",
+                  appState.stylesPanelMode === "compact" ||
+                appState.stylesPanelMode === "mobile",
                   !!appState.editingTextElement,
                   data?.onPreventClose,
                 );
@@ -1564,7 +1566,7 @@ export const actionChangeFontFamily = register({
 
     return result;
   },
-  PanelComponent: ({ elements, appState, app, updateData, data }) => {
+  PanelComponent: ({ elements, appState, app, updateData }) => {
     const cachedElementsRef = useRef<ElementsMap>(new Map());
     const prevSelectedFontFamilyRef = useRef<number | null>(null);
     // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
@@ -1641,7 +1643,7 @@ export const actionChangeFontFamily = register({
     }, []);
 
     return (
-      <fieldset>
+      <>
         {appState.stylesPanelMode === "full" && (
           <legend>{t("labels.fontFamily")}</legend>
         )}
@@ -1649,7 +1651,7 @@ export const actionChangeFontFamily = register({
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
-          compactMode={appState.stylesPanelMode === "compact"}
+          compactMode={appState.stylesPanelMode !== "full"}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {
@@ -1661,7 +1663,8 @@ export const actionChangeFontFamily = register({
                 // defensive clear so immediate close won't abuse the cached elements
                 cachedElementsRef.current.clear();
               },
-              appState.stylesPanelMode === "compact",
+              appState.stylesPanelMode === "compact" ||
+                appState.stylesPanelMode === "mobile",
               !!appState.editingTextElement,
             );
           }}
@@ -1737,7 +1740,8 @@ export const actionChangeFontFamily = register({
 
               // Refocus text editor when font picker closes if we were editing text
               if (
-                appState.stylesPanelMode === "compact" &&
+                (appState.stylesPanelMode === "compact" ||
+                  appState.stylesPanelMode === "mobile") &&
                 appState.editingTextElement
               ) {
                 restoreCaretPosition(null); // Just refocus without saved position
@@ -1745,7 +1749,7 @@ export const actionChangeFontFamily = register({
             }
           }}
         />
-      </fieldset>
+      </>
     );
   },
 });
@@ -1841,7 +1845,8 @@ export const actionChangeTextAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                appState.stylesPanelMode === "compact",
+                appState.stylesPanelMode === "compact" ||
+                  appState.stylesPanelMode === "mobile",
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );
@@ -1940,7 +1945,8 @@ export const actionChangeVerticalAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                appState.stylesPanelMode === "compact",
+                appState.stylesPanelMode === "compact" ||
+                  appState.stylesPanelMode === "mobile",
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );
@@ -2251,8 +2257,8 @@ export const actionChangeArrowProperties = register({
   PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
     return (
       <div className="selected-shape-actions">
-        {renderAction("changeArrowType")}
         {renderAction("changeArrowhead")}
+        {renderAction("changeArrowType")}
       </div>
     );
   },

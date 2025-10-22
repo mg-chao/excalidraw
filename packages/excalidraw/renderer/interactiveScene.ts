@@ -23,7 +23,7 @@ import {
   getOmitSidesForDevice,
   getTransformHandles,
   getTransformHandlesFromCoords,
-  shouldShowBoundingBox,
+  hasBoundingBox,
 } from "@excalidraw/element";
 import {
   isElbowArrow,
@@ -893,7 +893,7 @@ const _renderInteractiveScene = ({
 
   // Paint selected elements
   if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
-    const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
+    const showBoundingBox = hasBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =
       selectedElements.length === 1 && isLinearElement(selectedElements[0]);

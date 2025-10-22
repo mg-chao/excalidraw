@@ -4,7 +4,7 @@ import { isFrameLikeElement } from "@excalidraw/element";
 
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 
-import { KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
+import { KEYS, arrayToMap } from "@excalidraw/common";
 
 import { alignElements } from "@excalidraw/element";
 
@@ -38,6 +38,8 @@ import {
   type AppState,
   type UIAppState,
 } from "../types";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
