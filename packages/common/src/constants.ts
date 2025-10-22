@@ -460,7 +460,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
 } = {
-  strokeColor: COLOR_PALETTE.black,
+  strokeColor: COLOR_PALETTE.red,
   backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "solid",
   strokeWidth: 2,
