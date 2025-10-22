@@ -319,6 +319,11 @@ export const ColorPicker = ({
 }: ColorPickerProps) => {
   const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
 
+  const compactMode =
+    type !== "canvasBackground" &&
+    (appState.stylesPanelMode === "compact" ||
+      appState.stylesPanelMode === "mobile");
+
   const renderPopover = () => {
     if (customOptions?.pickerRenders?.colorPickerPopoverRender) {
       return customOptions.pickerRenders.colorPickerPopoverRender({
@@ -332,12 +337,7 @@ export const ColorPicker = ({
       });
     }
 
-    const compactMode =
-    type !== "canvasBackground" &&
-    (appState.stylesPanelMode === "compact" ||
-      appState.stylesPanelMode === "mobile");
-
-  return (
+    return (
       <Popover.Root
         open={appState.openPopup === type}
         onOpenChange={(open) => {
