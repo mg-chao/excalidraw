@@ -7052,10 +7052,15 @@ class App extends React.Component<AppProps, AppState> {
         hitElement && this.isASelectedElement(hitElement);
 
       if (
-        !isActiveSelectionTool ||
-        (hitSelectedElement &&
-          hitElement?.type === "text" &&
-          !hitElement.id.startsWith("snow-shot_serial-number"))
+        (!isActiveSelectionTool ||
+          (hitSelectedElement &&
+            hitElement?.type === "text" &&
+            !hitElement.id.startsWith("snow-shot_serial-number"))) &&
+        // 选择工具下如果多选，则不进入文本编辑状态
+        !(
+          this.state.activeTool.type === "selection" &&
+          Object.keys(this.state.selectedElementIds).length > 1
+        )
       ) {
         this.handleTextOnPointerDown(event, pointerDownState);
       }
