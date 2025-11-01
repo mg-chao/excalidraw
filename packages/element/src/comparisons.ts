@@ -17,7 +17,9 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "freedraw" ||
   type === "arrow" ||
   type === "line" ||
-  type === "text";
+  type === "text" ||
+  type === "watermark" ||
+  type === "highlight";
 
 export const hasTextStrokeColor = (type: ElementOrToolType) => type === "text";
 
