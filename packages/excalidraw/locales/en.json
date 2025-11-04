@@ -36,6 +36,7 @@
     "textSerialNumberType_number": "Number",
     "textSerialNumberType_letter": "Letter",
     "textSerialNumberType_roman": "Roman",
+    "textSerialNumberType_chinese": "Chinese",
     "strokeStyle": "Stroke style",
     "strokeStyle_none": "None",
     "strokeStyle_solid": "Solid",

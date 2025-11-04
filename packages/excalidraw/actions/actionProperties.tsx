@@ -143,6 +143,7 @@ import {
   NumberIcon,
   LetterIcon,
   RomanIcon,
+  ChineseNumberIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1012,6 +1013,11 @@ export const actionChangeTextSerialNumberType = register({
               text: t("labels.textSerialNumberType_roman"),
               icon: RomanIcon,
             },
+            {
+              value: "chinese",
+              text: t("labels.textSerialNumberType_chinese"),
+              icon: ChineseNumberIcon,
+            },
           ]}
           value={getFormValue(
             elements,
@@ -1709,7 +1715,7 @@ export const actionChangeFontFamily = register({
     }, []);
 
     return (
-      <>
+      <fieldset>
         {appState.stylesPanelMode === "full" && (
           <legend>{t("labels.fontFamily")}</legend>
         )}
@@ -1815,7 +1821,7 @@ export const actionChangeFontFamily = register({
             }
           }}
         />
-      </>
+      </fieldset>
     );
   },
 });

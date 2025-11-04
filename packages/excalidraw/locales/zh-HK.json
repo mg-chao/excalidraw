@@ -34,6 +34,7 @@
     "textSerialNumberType_number": "數字",
     "textSerialNumberType_letter": "字母",
     "textSerialNumberType_roman": "羅馬數字",
+    "textSerialNumberType_chinese": "中文數字",
     "strokeStyle": "筆跡線條",
     "strokeStyle_none": "無",
     "strokeStyle_solid": "實線",

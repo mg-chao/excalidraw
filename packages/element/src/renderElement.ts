@@ -133,10 +133,46 @@ const numberToLetter = (num: number): string => {
   let result = "";
   while (num > 0) {
     num--; // 1-based to 0-based
-    result = String.fromCharCode(97 + (num % 26)) + result;
+    result = String.fromCharCode(65 + (num % 26)) + result;
     num = Math.floor(num / 26);
   }
   return result;
+};
+
+const numberToChinese = (num: number): string => {
+  if (num <= 0) {
+    return "";
+  }
+  if (num >= 100) {
+    return num.toString();
+  }
+
+  const chineseDigits = [
+    "一",
+    "二",
+    "三",
+    "四",
+    "五",
+    "六",
+    "七",
+    "八",
+    "九",
+    "十",
+  ];
+
+  if (num <= 10) {
+    return chineseDigits[num - 1];
+  }
+
+  const tens = Math.floor(num / 10);
+  const ones = num % 10;
+
+  if (ones === 0) {
+    // 对于整十的数，如20、30等，显示为"二十"、"三十"等
+    return `${chineseDigits[tens - 1]}十`;
+  }
+  // 对于非整十的数，如21、32等，直接显示为"二一"、"三二"等
+  return `${chineseDigits[tens - 1]}${chineseDigits[ones - 1]}`;
 };
 
 const numberToRoman = (num: number): string => {
@@ -559,6 +595,8 @@ const drawElementOnCanvas = (
             elementText = numberToLetter(numberValue);
           } else if (element.textSerialNumberType === "roman") {
             elementText = numberToRoman(numberValue);
+          } else if (element.textSerialNumberType === "chinese") {
+            elementText = numberToChinese(numberValue);
           }
         }
 

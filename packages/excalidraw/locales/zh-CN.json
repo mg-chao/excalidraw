@@ -31,6 +31,7 @@
     "textSerialNumberType_number": "数字",
     "textSerialNumberType_letter": "字母",
     "textSerialNumberType_roman": "罗马数字",
+    "textSerialNumberType_chinese": "中文数字",
     "penMode": "画笔样式",
     "penMode_hard": "硬笔",
     "penMode_soft": "软笔",
