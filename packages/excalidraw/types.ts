@@ -342,6 +342,7 @@ export interface AppState {
   exportScale: number;
   currentItemStrokeColor: string;
   currentItemTextBackgroundColor: string;
+  currentItemTextSerialNumberType: "number" | "letter" | "roman";
   currentItemTextStrokeColor: string;
   currentItemTextStrokeWidth: number;
   currentItemBackgroundColor: string;

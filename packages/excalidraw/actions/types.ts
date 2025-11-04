@@ -152,7 +152,8 @@ export type ActionName =
   | "changeBlur"
   | "changeBlurFilterType"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "changeTextSerialNumberType";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

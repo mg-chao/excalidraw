@@ -276,6 +276,8 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     textStrokeWidth: number;
     /** 文本背景色 */
     textBackgroundColor: string;
+    /// 序列号类型
+    textSerialNumberType: "number" | "letter" | "roman";
     /**
      * If `true` the width will fit the text. If `false`, the text will
      * wrap to fit the width.

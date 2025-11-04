@@ -323,6 +323,7 @@ export const newTextElement = (
     textStrokeColor?: ExcalidrawTextElement["textStrokeColor"];
     textStrokeWidth?: ExcalidrawTextElement["textStrokeWidth"];
     textBackgroundColor?: ExcalidrawTextElement["textBackgroundColor"];
+    textSerialNumberType?: ExcalidrawTextElement["textSerialNumberType"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -359,6 +360,7 @@ export const newTextElement = (
     textStrokeColor: opts.textStrokeColor || "transparent",
     textStrokeWidth: opts.textStrokeWidth || 0,
     textBackgroundColor: opts.textBackgroundColor || "transparent",
+    textSerialNumberType: opts.textSerialNumberType || "number",
   };
 
   const textElement: ExcalidrawTextElement = newElementWith(

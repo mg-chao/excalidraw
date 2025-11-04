@@ -43,6 +43,7 @@ export const getDefaultAppState = (): Omit<
     currentItemFilterType: "blur",
     currentItemTextStrokeColor: "transparent",
     currentItemTextBackgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor,
+    currentItemTextSerialNumberType: "number",
     currentItemTextStrokeWidth: 0,
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
     currentItemStartArrowhead: null,
@@ -173,6 +174,7 @@ const APP_STATE_STORAGE_CONF = (<
   },
   currentItemShapeType: { browser: true, export: false, server: false },
   currentItemBorderType: { browser: true, export: false, server: false },
+  currentItemTextSerialNumberType: { browser: true, export: false, server: false },
   currentItemTextStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextStrokeColor: { browser: true, export: false, server: false },
   currentItemTextBackgroundColor: {

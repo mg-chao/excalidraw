@@ -294,6 +294,7 @@ export const restoreElement = (
         textStrokeColor: element.textStrokeColor || "transparent",
         textStrokeWidth: element.textStrokeWidth || 0,
         textBackgroundColor: element.textBackgroundColor || "transparent",
+        textSerialNumberType: element.textSerialNumberType || "number",
       });
 
       // if empty text, mark as deleted. We keep in array

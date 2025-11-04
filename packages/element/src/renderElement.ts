@@ -126,6 +126,86 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
   }
 };
 
+const numberToLetter = (num: number): string => {
+  if (num <= 0) {
+    return "";
+  }
+  let result = "";
+  while (num > 0) {
+    num--; // 1-based to 0-based
+    result = String.fromCharCode(65 + (num % 26)) + result;
+    num = Math.floor(num / 26);
+  }
+  return result;
+};
+
+const numberToChinese = (num: number): string => {
+  if (num <= 0) {
+    return "";
+  }
+  if (num >= 100) {
+    return num.toString();
+  }
+
+  const chineseDigits = [
+    "一",
+    "二",
+    "三",
+    "四",
+    "五",
+    "六",
+    "七",
+    "八",
+    "九",
+    "十",
+  ];
+
+  if (num <= 10) {
+    return chineseDigits[num - 1];
+  }
+
+  const tens = Math.floor(num / 10);
+  const ones = num % 10;
+
+  if (ones === 0) {
+    // 对于整十的数，如20、30等，显示为"二十"、"三十"等
+    return `${chineseDigits[tens - 1]}十`;
+  }
+  // 对于非整十的数，如21、32等，直接显示为"二一"、"三二"等
+  return `${chineseDigits[tens - 1]}${chineseDigits[ones - 1]}`;
+};
+
+const numberToRoman = (num: number): string => {
+  if (num <= 0 || num >= 4000) {
+    return num.toString();
+  }
+
+  const romanNumerals = [
+    { value: 1000, symbol: "M" },
+    { value: 900, symbol: "CM" },
+    { value: 500, symbol: "D" },
+    { value: 400, symbol: "CD" },
+    { value: 100, symbol: "C" },
+    { value: 90, symbol: "XC" },
+    { value: 50, symbol: "L" },
+    { value: 40, symbol: "XL" },
+    { value: 10, symbol: "X" },
+    { value: 9, symbol: "IX" },
+    { value: 5, symbol: "V" },
+    { value: 4, symbol: "IV" },
+    { value: 1, symbol: "I" },
+  ];
+
+  let result = "";
+  for (const { value, symbol } of romanNumerals) {
+    while (num >= value) {
+      result += symbol;
+      num -= value;
+    }
+  }
+  return result;
+};
+
 export const getRenderOpacity = (
   element: ExcalidrawElement,
   containingFrame: ExcalidrawFrameLikeElement | null,
@@ -506,7 +586,21 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        const rtl = isRTL(element.text);
+        let elementText = element.text;
+        if (element.id.startsWith("snow-shot_serial-number_")) {
+          const numberValue = parseInt(element.text);
+          if (element.textSerialNumberType === "number") {
+            elementText = numberValue.toString();
+          } else if (element.textSerialNumberType === "letter") {
+            elementText = numberToLetter(numberValue);
+          } else if (element.textSerialNumberType === "roman") {
+            elementText = numberToRoman(numberValue);
+          } else if (element.textSerialNumberType === "chinese") {
+            elementText = numberToChinese(numberValue);
+          }
+        }
+
+        const rtl = isRTL(elementText);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
           // to correctly render RTL text mixed with LTR, we have to append it
@@ -520,7 +614,7 @@ const drawElementOnCanvas = (
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lines = elementText.replace(/\r\n?/g, "\n").split("\n");
 
         const horizontalOffset =
           element.textAlign === "center"
