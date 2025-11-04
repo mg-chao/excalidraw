@@ -140,6 +140,9 @@ import {
   BrushIcon,
   HardPenIcon,
   StrokeWidthNoneIcon,
+  NumberIcon,
+  LetterIcon,
+  RomanIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -391,9 +394,9 @@ export const actionChangeStrokeColor = register({
           appState={appState}
           updateData={updateData}
           compactMode={
-          appState.stylesPanelMode === "compact" ||
-          appState.stylesPanelMode === "mobile"
-        }
+            appState.stylesPanelMode === "compact" ||
+            appState.stylesPanelMode === "mobile"
+          }
         />
       </>
     );
@@ -725,9 +728,9 @@ export const actionChangeBackgroundColor = register({
           appState={appState}
           updateData={updateData}
           compactMode={
-          appState.stylesPanelMode === "compact" ||
-          appState.stylesPanelMode === "mobile"
-        }
+            appState.stylesPanelMode === "compact" ||
+            appState.stylesPanelMode === "mobile"
+          }
         />
       </>
     );
@@ -834,8 +837,8 @@ export const actionChangeStrokeWidth = register({
 
     return (
       <fieldset>
-          <legend>{t("labels.strokeWidth")}</legend>
-          <div>
+        <legend>{t("labels.strokeWidth")}</legend>
+        <div>
           {customOptions?.pickerRenders?.ChangeStrokeWidthSlider ? (
             <customOptions.pickerRenders.ChangeStrokeWidthSlider
               value={getFormValue(
@@ -959,6 +962,69 @@ export const actionPenMode = register({
             (element) => element.hasOwnProperty("penMode"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemPenMode,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
+});
+
+export const actionChangeTextSerialNumberType = register({
+  name: "changeTextSerialNumberType",
+  label: "labels.textSerialNumberType",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isTextElement(el)) {
+          return newElementWith(el, {
+            textSerialNumberType: value,
+          } as any);
+        }
+        return el;
+      }),
+      appState: { ...appState, currentItemTextSerialNumberType: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
+    <fieldset>
+      {appState.stylesPanelMode === "full" && (
+        <legend>{t("labels.textSerialNumberType")}</legend>
+      )}
+      <div>
+        <RadioSelection
+          group="textSerialNumberType"
+          options={[
+            {
+              value: "number",
+              text: t("labels.textSerialNumberType_number"),
+              icon: NumberIcon,
+            },
+            {
+              value: "letter",
+              text: t("labels.textSerialNumberType_letter"),
+              icon: LetterIcon,
+            },
+            {
+              value: "roman",
+              text: t("labels.textSerialNumberType_roman"),
+              icon: RomanIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            app,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.textSerialNumberType;
+              }
+              return "number";
+            },
+            (element) => element.hasOwnProperty("textSerialNumberType"),
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemTextSerialNumberType,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -1300,7 +1366,7 @@ export const actionChangeFontSize = register({
                 withCaretPositionPreservation(
                   () => updateData(value),
                   appState.stylesPanelMode === "compact" ||
-                appState.stylesPanelMode === "mobile",
+                    appState.stylesPanelMode === "mobile",
                   !!appState.editingTextElement,
                   data?.onPreventClose,
                 );

@@ -5545,6 +5545,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeColor: this.state.currentItemStrokeColor,
         textStrokeColor: this.state.currentItemTextStrokeColor,
         textBackgroundColor: this.state.currentItemTextBackgroundColor,
+        textSerialNumberType: this.state.currentItemTextSerialNumberType,
         textStrokeWidth: this.state.currentItemTextStrokeWidth,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,

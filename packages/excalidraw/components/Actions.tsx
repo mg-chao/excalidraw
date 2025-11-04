@@ -258,6 +258,14 @@ export const SelectedShapeActions = ({
         <div>{renderAction("changeTextStrokeWidth")}</div>
       )}
 
+      {(isSerialNumberTool ||
+        targetElements.some(
+          (element) =>
+            element.type === "text" &&
+            element.id.startsWith("snow-shot_serial-number_"),
+        )) &&
+        renderAction("changeTextSerialNumberType")}
+
       {customOptions?.pickerRenders?.SubToolEditor && (
         <customOptions.pickerRenders.SubToolEditor
           appState={appState}
